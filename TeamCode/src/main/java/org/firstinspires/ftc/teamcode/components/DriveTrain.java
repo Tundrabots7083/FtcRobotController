@@ -195,8 +195,16 @@ public class DriveTrain extends BotComponent {
 
     public void updateMotorsMechanumDrive(double leftX, double leftY, double rightX, double rightY) {
 
+    /*    frontLeftMotor.setPower(leftY + rightX + leftX);
+        backLeftMotor.setPower(leftY + rightX - leftX);
+        frontRightMotor.setPower(leftY - rightX - leftX);
+        backRightMotor.setPower(leftY - rightX + leftX); */
+        frontLeftMotor.setPower(-leftX);
+        backLeftMotor.setPower(leftX);
+        frontRightMotor.setPower(leftX);
+        backRightMotor.setPower(-leftX);
 
-        double lX = -leftX;
+    /*    double lX = -leftX;
         double lY = leftY;
         double rX = -rightX;
         double rY = rightY;
@@ -209,6 +217,7 @@ public class DriveTrain extends BotComponent {
         final double v3 = r * Math.sin(robotAngle) + rX;
         final double v4 = r * Math.cos(robotAngle) - rX;
 
+
         if (frontMotorsEnabled) {
             frontLeftMotor.setPower(v1);
             frontRightMotor.setPower(v2);
@@ -219,7 +228,7 @@ public class DriveTrain extends BotComponent {
             backRightMotor.setPower(v4);
         }
 
-        if (!opModeIsActive()) { stop(); }
+        if (!opModeIsActive()) { stop(); } */
 
 
     }

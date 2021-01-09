@@ -55,7 +55,7 @@ public class Shooter extends BotComponent {
 
     public void setShooterPower (double power){
         Shooter2.setPower(-power);
-        Shooter1.setPower(power);
+        Shooter1.setPower(-power);
     }
 
 

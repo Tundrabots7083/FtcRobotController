@@ -12,7 +12,7 @@ public class Loader extends BotComponent {
 
     public Servo loaderServo = null;
     private String servoName;
-    double SERVO_IN_POSITION = .94;
+    double SERVO_IN_POSITION = .75;
     double SERVO_OUT_POSITION = .25;
 
 

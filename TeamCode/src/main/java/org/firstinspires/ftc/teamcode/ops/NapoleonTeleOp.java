@@ -44,19 +44,25 @@ public class NapoleonTeleOp extends LinearOpMode {
 
 
             /********** Put Your Code Here **********/
-            if (robot.driveTrain.isAvailable) {
-                double leftX = gamepad1.left_stick_x;
+
+                if (gamepad1.x) {
+                  //  robot.driveTrain.frontRightMotor.setPower(1);
+                   //robot.driveTrain.backLeftMotor.setPower(1);
+                 //   robot.driveTrain.backRightMotor.setPower(1);
+                    robot.driveTrain.frontLeftMotor.setPower(1);
+                }
+              /*  double leftX = gamepad1.left_stick_x;
                 double leftY = gamepad1.left_stick_y;
                 double rightX = gamepad1.right_stick_x;
                 double rightY = gamepad1.right_stick_y;
 
-                robot.driveTrain.updateMotorsMechanumDrive(leftX, leftY, -rightX, rightY);
+                robot.driveTrain.updateMotorsMechanumDrive(leftX, leftY, rightX, rightY);
 
                 telemetry.addData("Status", "Run Time: " + runtime.toString());
                 telemetry.addData("Left", "X (%.2f), Y (%.2f)", leftX, leftY);
-                telemetry.addData("Right", "X (%.2f), Y (%.2f)", rightX, rightY);
+                telemetry.addData("Right", "X (%.2f), Y (%.2f)", rightX, rightY); */
 
-            }
+
 
             if (robot.intake.isAvailable) {
                 if (gamepad1.left_trigger > 0) {
@@ -87,12 +93,7 @@ public class NapoleonTeleOp extends LinearOpMode {
             if (gamepad1.b) {
                 robot.shooter.setShooterPower(.8);
             }
-            if (gamepad1.x) {
-                robot.shooter.setShooterPower(0.7);
-            }
-            if (gamepad1.y) {
-                robot.shooter.setShooterPower(0.75);
-            }
+
 
         }
     }
