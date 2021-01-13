@@ -10,7 +10,7 @@ public class Intake extends BotComponent {
     private String rightIntakeName;
 
 
-    public DcMotor Right_Intake = null;
+    public DcMotor Intake = null;
 
 
 
@@ -35,10 +35,10 @@ public class Intake extends BotComponent {
 
         //define and initialize motors
 
-        Right_Intake = initMotor(rightIntakeName, DcMotor.Direction.REVERSE);
+        Intake = initMotor(rightIntakeName, DcMotor.Direction.REVERSE);
 
 
-        if (Right_Intake != null) {
+        if (Intake != null) {
             isAvailable = true;
         }
 
@@ -48,7 +48,7 @@ public class Intake extends BotComponent {
 
     public void setIntakePower (double power){
 
-        Right_Intake.setPower(power);
+        Intake.setPower(power);
     }
 
 

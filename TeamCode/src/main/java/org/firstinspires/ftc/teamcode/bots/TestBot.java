@@ -34,8 +34,8 @@ public class TestBot extends Bot {
                 "backLeftMotor", "backRightMotor",
                 gyroNavigator);
         intake = new Intake(logger, aOpMode, "rightIntake");
-        loader = new Loader(logger, aOpMode, "loader");
-        shooter = new Shooter(logger, aOpMode, "shooterOne", "shooterTwo");
+        loader = new Loader(logger, aOpMode, "loader", "indexer");
+        shooter = new Shooter(logger, aOpMode, "shooterOne", "shooterTwo", "shooterAngle");
 
 
     }

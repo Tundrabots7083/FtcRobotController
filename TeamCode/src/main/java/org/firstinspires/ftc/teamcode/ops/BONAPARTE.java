@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.components.DriveTrain;
+import org.firstinspires.ftc.teamcode.components.Intake;
 
 
 @TeleOp(name="BONAPARTE", group="ops")
@@ -27,48 +28,30 @@ public class BONAPARTE extends LinearOpMode {
     //------------------------------InitSetup?--------------------------------------------------------\\
 
 
-    public DcMotor Intake     = null;
-    public DcMotor Shooter1   = null;
-    public DcMotor Shooter2   = null;
-    public Servo   ShootAngle = null;
-    public Servo   loader     = null;
-    public Servo   indexer    = null;
-    public Servo   wobbleArm    = null;
-    public Servo wobbleClaw     = null;
+
+
+
 
 
     @Override
     public void runOpMode() {
 
-
-//------------------------------PhoneHardWareMap--------------------------------------------------\\
-
-
-        Intake      = hardwareMap.dcMotor.get ( "rightIntake ");
-        Shooter1    = hardwareMap.dcMotor.get ( "shooterOne        ");
-        Shooter2    = hardwareMap.dcMotor.get ( "shooterTwo        ");
-        loader      = hardwareMap.servo.get   ( "loader            ");
-        ShootAngle  = hardwareMap.servo.get   ( "shooterAngle      ");
-        indexer     = hardwareMap.servo.get   ( "indexer           ");
-        wobbleArm   = hardwareMap.servo.get   ( "wobbleArm           ");
-        wobbleClaw  = hardwareMap.servo.get   ( "wobbleClaw          ");
-
+        robot.initAll();
+        robot.driveTrain.init(DriveTrain.InitType.INIT_4WD);
+        robot.intake.init();
 
 //------------------------------Direction---------------------------------------------------------\\
 
         //Reverse spins motors to the right Forward spins motors to the left
-        Intake     .setDirection (DcMotorSimple.Direction.REVERSE);
+        /*Intake     .setDirection (DcMotorSimple.Direction.REVERSE);
         Shooter1   .setDirection (DcMotorSimple.Direction.FORWARD);
-        Shooter2   .setDirection (DcMotorSimple.Direction.FORWARD);
+        Shooter2   .setDirection (DcMotorSimple.Direction.FORWARD); */
 
 
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
         robot.logger.logInfo("runOpMode", "===== [ Start Initializing ]");
 
         /* Use either robot.initAll or select only the components that need initializing below */
-        robot.initAll();
-        robot.driveTrain.init(DriveTrain.InitType.INIT_4WD);
-        robot.intake.init();
 
         robot.logger.logInfo("runOpMode", "===== [ Initialization Complete ]");
         telemetry.update();
@@ -93,59 +76,57 @@ public class BONAPARTE extends LinearOpMode {
             //sketchy intake code idk if work
             if      (gamepad1.right_trigger > .1)
             {
-                indexer.setPosition(.65);
-                Intake.setPower(1);
+                robot.loader.indexer.setPosition(.65);
+                robot.intake.setIntakePower(1);
             }
             else if (gamepad1.left_trigger  > .1)
             {
-                Intake.setPower(-1);
+                robot.intake.setIntakePower(-1);
             }
             else
             {
-                Intake.setPower(0);
+                robot.intake.setIntakePower(0);
             }
 
             if (gamepad1.left_bumper)
             {
-                Shooter1.setPower(-.8);
-                Shooter2.setPower(-.8);
-                indexer.setPosition(1);
+                robot.shooter.setShooterPower(-.8);
+                robot.loader.indexer.setPosition(1);
             }
             else
             {
-                Shooter1.setPower(0);
-                Shooter2.setPower(0);
+                robot.shooter.setShooterPower(0);
             }
 
             if (gamepad1.right_bumper)
             {
                 //change values
-                loader.setPosition(.5);
+                robot.loader.loaderServo.setPosition(.5);
             }
             else
             {
                 //change value
-                loader.setPosition(.83);
+                robot.loader.loaderServo.setPosition(.83);
             }
 
             if     (gamepad1.y)
             {
-                indexer.setPosition(.65);
+                robot.loader.indexer.setPosition(.65);
             }
             else if(gamepad1.b)
             {
-                indexer.setPosition(1);
+                robot.loader.indexer.setPosition(1);
             }
 
             if      (gamepad1.dpad_down)
             {
                 //change values
-                ShootAngle.setPosition(.75);
+                robot.shooter.ShootAngle.setPosition(.75);
             }
             else if (gamepad1.dpad_up)
             {
                 //change values
-                ShootAngle.setPosition(1);
+                robot.shooter.ShootAngle.setPosition(1);
             }
 
         }
