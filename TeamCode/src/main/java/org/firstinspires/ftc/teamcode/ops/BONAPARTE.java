@@ -82,66 +82,88 @@ public class BONAPARTE extends LinearOpMode {
 
 
 
-//------------------------------Wobble------------------------------------------------------------\\
-//non existent just bad
+
 
         while (opModeIsActive()) {
 
-                  //field oriented gamepad stuff
+            //field oriented gamepad stuff
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
-            //sketchy intake code idk if work
+            //intake on and indexer to down postiion
             if      (gamepad1.right_trigger > .1)
             {
                 indexer.setPosition(.65);
                 Intake.setPower(1);
             }
+
+            //intake backwards
             else if (gamepad1.left_trigger  > .1)
             {
                 Intake.setPower(-1);
             }
+
+            //intake off
             else
             {
                 Intake.setPower(0);
             }
 
+            //shooter on and indexer to up position
             if (gamepad1.left_bumper)
             {
-                Shooter1.setPower(-.8);
-                Shooter2.setPower(-.8);
+                Shooter1.setPower(-.7);
+                Shooter2.setPower(-.7);
                 indexer.setPosition(1);
             }
+
+            //shooter off
             else
             {
                 Shooter1.setPower(0);
                 Shooter2.setPower(0);
             }
 
+            //loader out position
             if (gamepad1.right_bumper)
             {
                 //change values
                 loader.setPosition(.5);
             }
+
+            //loader in position
             else
             {
                 //change value
                 loader.setPosition(.83);
             }
 
+            //manual indexer override down position
             if     (gamepad1.y)
             {
                 indexer.setPosition(.65);
             }
+
+            //manual indexer override up postion
             else if(gamepad1.b)
             {
                 indexer.setPosition(1);
             }
 
+            //highgoal position
             if      (gamepad1.dpad_down)
             {
                 //change values
-                ShootAngle.setPosition(.75);
+                ShootAngle.setPosition(.8);
             }
+
+            //powershot position
+            if      (gamepad1.dpad_right)
+            {
+                //change values
+                ShootAngle.setPosition(.78);
+            }
+
+            //highest position
             else if (gamepad1.dpad_up)
             {
                 //change values
