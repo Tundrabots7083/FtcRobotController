@@ -116,16 +116,6 @@ public class BONAPARTE extends LinearOpMode {
                 loader.setPosition(.83);
             }
 
-            //manual indexer override down position
-            if (gamepad1.y) {
-                indexer.setPosition(.65);
-            }
-
-            //manual indexer override up postion
-            else if (gamepad1.b) {
-                indexer.setPosition(1);
-            }
-
             //highgoal position
             if (gamepad1.dpad_down) {
                 //change values
@@ -142,6 +132,27 @@ public class BONAPARTE extends LinearOpMode {
             else if (gamepad1.dpad_up) {
                 //change values
                 ShootAngle.setPosition(1);
+            }
+
+            //wobble goal arm down
+            if (gamepad1.x){
+                //change values
+                wobbleArm.setPosition(.45);
+            }
+            // wobble arm up
+            else if (gamepad1.a) {
+                //change values
+                wobbleArm.setPosition(.05);
+            }
+
+            //wobble claw open
+            if (gamepad1.y) {
+                wobbleClaw.setPosition(.4);
+            }
+
+            //wobble claw close
+            else if (gamepad1.b) {
+                wobbleClaw.setPosition(.15);
             }
 
         }
