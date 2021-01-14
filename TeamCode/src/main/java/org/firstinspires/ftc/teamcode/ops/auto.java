@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.ops;
         import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
         import com.qualcomm.robotcore.util.ElapsedTime;
 
+        import org.firstinspires.ftc.robotcore.internal.usb.exception.RobotUsbTimeoutException;
         import org.firstinspires.ftc.teamcode.bots.TestBot;
         import org.opencv.core.Core;
         import org.opencv.core.Mat;
@@ -56,12 +57,12 @@ public class auto extends LinearOpMode {
         waitForStart();
 
 // uncomment while loop to tweak camera comment for robot to sense then do drive paths
-        while (opModeIsActive()){
+      /*  while (opModeIsActive()){
             telemetry.addData("Analysis", pipeline.getAnalysis());
             telemetry.addData("Position",pipeline.position);
             telemetry.update();
             sleep(50);
-        }
+        } */
         //sleeps for camera to have time to sense tweak to whatever is good
         sleep(1000);
 
@@ -69,7 +70,21 @@ public class auto extends LinearOpMode {
 //------------------------------Drive-Paths-Below-------------------------------------------------\\
 
         if (pipeline.getAnalysis()>pipeline.FOUR_RING_THRESHOLD)
-        { }
+        {
+
+            robot.driveTrain.frontRightMotor.setPower(.1);
+            robot.driveTrain.frontLeftMotor.setPower(.1);
+            robot.driveTrain.backRightMotor.setPower(.1);
+            robot.driveTrain.backLeftMotor.setPower(.1);
+
+            sleep(3000);
+
+            robot.driveTrain.frontRightMotor.setPower(0);
+            robot.driveTrain.frontLeftMotor.setPower(0);
+            robot.driveTrain.backRightMotor.setPower(0);
+            robot.driveTrain.backLeftMotor.setPower(0);
+
+        }
         else if (pipeline.getAnalysis()>pipeline.ONE_RING_THRESHOLD)
         { }
         else
