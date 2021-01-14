@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.components.DriveTrain;
 
 
-@TeleOp(name="BONAPARTE", group="ops")
+@TeleOp(name = "BONAPARTE", group = "ops")
 public class BONAPARTE extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -22,44 +22,34 @@ public class BONAPARTE extends LinearOpMode {
 
 
 
-
-
-    //------------------------------InitSetup?--------------------------------------------------------\\
-
-
-    public DcMotor Intake     = null;
-    public DcMotor Shooter1   = null;
-    public DcMotor Shooter2   = null;
-    public Servo   ShootAngle = null;
-    public Servo   loader     = null;
-    public Servo   indexer    = null;
-    public Servo   wobbleArm    = null;
-    public Servo wobbleClaw     = null;
+    public DcMotor Intake = null;
+    public DcMotor Shooter1 = null;
+    public DcMotor Shooter2 = null;
+    public Servo ShootAngle = null;
+    public Servo loader = null;
+    public Servo indexer = null;
+    public Servo wobbleArm = null;
+    public Servo wobbleClaw = null;
 
 
     @Override
     public void runOpMode() {
 
 
-//------------------------------PhoneHardWareMap--------------------------------------------------\\
+        Intake = hardwareMap.dcMotor.get("rightIntake");
+        Shooter1 = hardwareMap.dcMotor.get("shooterOne");
+        Shooter2 = hardwareMap.dcMotor.get("shooterTwo");
+        loader = hardwareMap.servo.get("loader");
+        ShootAngle = hardwareMap.servo.get("shooterAngle");
+        indexer = hardwareMap.servo.get("indexer");
+        wobbleArm = hardwareMap.servo.get("wobbleArm");
+        wobbleClaw = hardwareMap.servo.get("wobbleClaw");
 
-
-        Intake      = hardwareMap.dcMotor.get ( "rightIntake ");
-        Shooter1    = hardwareMap.dcMotor.get ( "shooterOne        ");
-        Shooter2    = hardwareMap.dcMotor.get ( "shooterTwo        ");
-        loader      = hardwareMap.servo.get   ( "loader            ");
-        ShootAngle  = hardwareMap.servo.get   ( "shooterAngle      ");
-        indexer     = hardwareMap.servo.get   ( "indexer           ");
-        wobbleArm   = hardwareMap.servo.get   ( "wobbleArm           ");
-        wobbleClaw  = hardwareMap.servo.get   ( "wobbleClaw          ");
-
-
-//------------------------------Direction---------------------------------------------------------\\
 
         //Reverse spins motors to the right Forward spins motors to the left
-        Intake     .setDirection (DcMotorSimple.Direction.REVERSE);
-        Shooter1   .setDirection (DcMotorSimple.Direction.FORWARD);
-        Shooter2   .setDirection (DcMotorSimple.Direction.FORWARD);
+        Intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        Shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
+        Shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
@@ -80,92 +70,76 @@ public class BONAPARTE extends LinearOpMode {
         runtime.reset();
 
 
-
-
-
-
         while (opModeIsActive()) {
 
             //field oriented gamepad stuff
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
             //intake on and indexer to down postiion
-            if      (gamepad1.right_trigger > .1)
-            {
+            if (gamepad1.right_trigger > .1) {
                 indexer.setPosition(.65);
                 Intake.setPower(1);
             }
 
             //intake backwards
-            else if (gamepad1.left_trigger  > .1)
-            {
+            else if (gamepad1.left_trigger > .1) {
                 Intake.setPower(-1);
             }
 
             //intake off
-            else
-            {
+            else {
                 Intake.setPower(0);
             }
 
             //shooter on and indexer to up position
-            if (gamepad1.left_bumper)
-            {
+            if (gamepad1.left_bumper) {
                 Shooter1.setPower(-.7);
                 Shooter2.setPower(-.7);
                 indexer.setPosition(1);
             }
 
             //shooter off
-            else
-            {
+            else {
                 Shooter1.setPower(0);
                 Shooter2.setPower(0);
             }
 
             //loader out position
-            if (gamepad1.right_bumper)
-            {
+            if (gamepad1.right_bumper) {
                 //change values
                 loader.setPosition(.5);
             }
 
             //loader in position
-            else
-            {
+            else {
                 //change value
                 loader.setPosition(.83);
             }
 
             //manual indexer override down position
-            if     (gamepad1.y)
-            {
+            if (gamepad1.y) {
                 indexer.setPosition(.65);
             }
 
             //manual indexer override up postion
-            else if(gamepad1.b)
-            {
+            else if (gamepad1.b) {
                 indexer.setPosition(1);
             }
 
             //highgoal position
-            if      (gamepad1.dpad_down)
-            {
+            if (gamepad1.dpad_down) {
                 //change values
                 ShootAngle.setPosition(.8);
             }
 
             //powershot position
-            if      (gamepad1.dpad_right)
-            {
+            if (gamepad1.dpad_right) {
                 //change values
                 ShootAngle.setPosition(.78);
             }
 
             //highest position
-            else if (gamepad1.dpad_up)
-            {
+            else if (gamepad1.dpad_up) {
                 //change values
                 ShootAngle.setPosition(1);
             }
@@ -175,20 +149,21 @@ public class BONAPARTE extends LinearOpMode {
 
     /**
      * real gamer field relative driving
+     *
      * @param ySpeed
      * @param xSpeed
      * @param turnSpeed
      **/
     public void FieldRelative(double ySpeed, double xSpeed, double turnSpeed) {
         double angle = robot.gyroNavigator.getAngleGood();
-        angle  = AngleWrapDeg(angle);
+        angle = AngleWrapDeg(angle);
         angle = -angle;
 
         xSpeed = Range.clip(xSpeed, -1, 1);
-        ySpeed = Range.clip(ySpeed, -1, 1 );
-        turnSpeed = Range.clip(turnSpeed, -1, 1 );
+        ySpeed = Range.clip(ySpeed, -1, 1);
+        turnSpeed = Range.clip(turnSpeed, -1, 1);
 
-        org.firstinspires.ftc.teamcode.geometry.Vector2d input = new org.firstinspires.ftc.teamcode.geometry.Vector2d(xSpeed,ySpeed);
+        org.firstinspires.ftc.teamcode.geometry.Vector2d input = new org.firstinspires.ftc.teamcode.geometry.Vector2d(xSpeed, ySpeed);
 
         input = input.rotateBy(angle);
 
@@ -204,15 +179,15 @@ public class BONAPARTE extends LinearOpMode {
         robot.driveTrain.frontLeftMotor.setPower(frontLeftPower);
         robot.driveTrain.frontRightMotor.setPower(frontRightPower);
 
-        telemetry.addData("angle",angle);
+        telemetry.addData("angle", angle);
         telemetry.update();
     }
 
     public double AngleWrapDeg(double degrees) {
-        while (degrees < -180 ) {
+        while (degrees < -180) {
             degrees += 2.0 * 180;
         }
-        while (degrees > 180 ) {
+        while (degrees > 180) {
             degrees -= 2.0 * 180;
         }
         return degrees;
