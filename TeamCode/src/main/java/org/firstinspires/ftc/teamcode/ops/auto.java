@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.ops;
 
         import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
         import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+        import com.qualcomm.robotcore.hardware.DcMotor;
         import com.qualcomm.robotcore.util.ElapsedTime;
 
         import org.firstinspires.ftc.robotcore.internal.usb.exception.RobotUsbTimeoutException;
@@ -20,6 +21,7 @@ package org.firstinspires.ftc.teamcode.ops;
         import org.openftc.easyopencv.OpenCvCameraRotation;
 
 
+
 @Autonomous(name="Sensing for dum dums", group="ops")
 public class auto extends LinearOpMode {
     // Declare OpMode members.
@@ -31,8 +33,15 @@ public class auto extends LinearOpMode {
     OpenCvCamera webcam;
     SkystoneDeterminationPipeline pipeline;
 
+    public DcMotor Intake = null;
+
+
     @Override
     public void runOpMode() throws InterruptedException {
+
+        Intake = hardwareMap.dcMotor.get("rightIntake");
+
+
 
         //Dont look unless broken
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -72,17 +81,8 @@ public class auto extends LinearOpMode {
         if (pipeline.getAnalysis()>pipeline.FOUR_RING_THRESHOLD)
         {
 
-            robot.driveTrain.frontRightMotor.setPower(.1);
-            robot.driveTrain.frontLeftMotor.setPower(.1);
-            robot.driveTrain.backRightMotor.setPower(.1);
-            robot.driveTrain.backLeftMotor.setPower(.1);
 
-            sleep(3000);
-
-            robot.driveTrain.frontRightMotor.setPower(0);
-            robot.driveTrain.frontLeftMotor.setPower(0);
-            robot.driveTrain.backRightMotor.setPower(0);
-            robot.driveTrain.backLeftMotor.setPower(0);
+            Intake.setPower(1);
 
         }
         else if (pipeline.getAnalysis()>pipeline.ONE_RING_THRESHOLD)
