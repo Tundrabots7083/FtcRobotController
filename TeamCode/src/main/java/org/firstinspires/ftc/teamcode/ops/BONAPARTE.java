@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.ops;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -19,12 +20,16 @@ public class BONAPARTE extends LinearOpMode {
     private TestBot robot = null;
     private boolean logEnableTrace = false;
     private boolean logToTelemetry = true;
+    public final double normflywheelspeed = 9000;
+
+    // 14 is ticks per revolution because we have a 2:1
+    public final double flywheelticksperminute = (normflywheelspeed * 14) / 60;
 
 
 
     public DcMotor Intake = null;
-    public DcMotor Shooter1 = null;
-    public DcMotor Shooter2 = null;
+    public DcMotorEx Shooter1 = null;
+    public DcMotorEx Shooter2 = null;
     public Servo ShootAngle = null;
     public Servo loader = null;
     public Servo indexer = null;
@@ -37,8 +42,8 @@ public class BONAPARTE extends LinearOpMode {
 
 
         Intake = hardwareMap.dcMotor.get("rightIntake");
-        Shooter1 = hardwareMap.dcMotor.get("shooterOne");
-        Shooter2 = hardwareMap.dcMotor.get("shooterTwo");
+        Shooter1 = hardwareMap.get(DcMotorEx.class,"shooterOne");
+        Shooter2 = hardwareMap.get(DcMotorEx.class,"shooterTwo");
         loader = hardwareMap.servo.get("loader");
         ShootAngle = hardwareMap.servo.get("shooterAngle");
         indexer = hardwareMap.servo.get("indexer");
@@ -48,8 +53,8 @@ public class BONAPARTE extends LinearOpMode {
 
         //Reverse spins motors to the right Forward spins motors to the left
         Intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        Shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
-        Shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
+        Shooter1.setDirection(DcMotorSimple.Direction.REVERSE);
+        Shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
@@ -93,15 +98,16 @@ public class BONAPARTE extends LinearOpMode {
 
             //shooter on and indexer to up position
             if (gamepad1.left_bumper) {
-                Shooter1.setPower(-.7);
-                Shooter2.setPower(-.7);
+                // mechanically linked more like cringe
+                Shooter1.setVelocity(flywheelticksperminute);
+                Shooter2.setPower(Shooter1.getPower());
                 indexer.setPosition(1);
             }
 
             //shooter off
             else {
-                Shooter1.setPower(0);
-                Shooter2.setPower(0);
+                Shooter1.setVelocity(0);
+                Shooter2.setPower(Shooter1.getPower());
             }
 
             //loader out position
@@ -143,6 +149,9 @@ public class BONAPARTE extends LinearOpMode {
                 //change values
                 ShootAngle.setPosition(1);
             }
+
+            telemetry.addData("shooter vleo",(Shooter1.getVelocity() / 14) * 60);
+
 
         }
     }
