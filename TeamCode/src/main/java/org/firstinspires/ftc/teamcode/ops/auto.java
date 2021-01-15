@@ -1,6 +1,43 @@
 package org.firstinspires.ftc.teamcode.ops;
 
-        import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+    import org.firstinspires.ftc.teamcode.util.*;
+    import org.firstinspires.ftc.teamcode.drive.*;
+
+    /*import org.firstinspires.ftc.teamcode.drive.opmode.AutomaticFeedforwardTuner;
+    import org.firstinspires.ftc.teamcode.drive.opmode.BackAndForth;
+    import org.firstinspires.ftc.teamcode.drive.opmode.DriveVelocityPIDTuner;
+    import org.firstinspires.ftc.teamcode.drive.opmode.FollowerPIDTuner;
+    import org.firstinspires.ftc.teamcode.drive.opmode.LocalizationTest;
+    import org.firstinspires.ftc.teamcode.drive.opmode.ManualFeedforwardTuner;
+    import org.firstinspires.ftc.teamcode.drive.opmode.MaxAngularVeloTuner;
+    import org.firstinspires.ftc.teamcode.drive.opmode.MaxVelocityTuner;
+    import org.firstinspires.ftc.teamcode.drive.opmode.SplineTest;
+    import org.firstinspires.ftc.teamcode.drive.opmode.StrafeTest;
+    import org.firstinspires.ftc.teamcode.drive.opmode.StraightTest;
+    import org.firstinspires.ftc.teamcode.drive.opmode.TrackingWheelLateralDistanceTuner;
+    import org.firstinspires.ftc.teamcode.drive.opmode.TrackWidthTuner;
+    import org.firstinspires.ftc.teamcode.drive.opmode.TurnTest;
+
+    import org.firstinspires.ftc.teamcode.drive.DriveConstants;
+    import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+    import org.firstinspires.ftc.teamcode.drive.SampleTankDrive;
+    import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
+
+    import org.firstinspires.ftc.teamcode.util.AssetsTrajectoryManager;
+    import org.firstinspires.ftc.teamcode.util.AxesSigns;
+    import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
+    import org.firstinspires.ftc.teamcode.util.DashboardUtil;
+    import org.firstinspires.ftc.teamcode.util.Encoder;
+    import org.firstinspires.ftc.teamcode.util.LoggingUtil;
+    import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
+    import org.firstinspires.ftc.teamcode.util.RegressionUtil;*/
+
+    import com.acmerobotics.roadrunner.geometry.*;
+    import com.acmerobotics.roadrunner.geometry.Pose2d;
+    import com.acmerobotics.roadrunner.trajectory.Trajectory;
+    import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+    import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
         import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
         import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -18,6 +55,7 @@ package org.firstinspires.ftc.teamcode.ops;
         import org.openftc.easyopencv.OpenCvCamera;
         import org.openftc.easyopencv.OpenCvCameraFactory;
         import org.openftc.easyopencv.OpenCvCameraRotation;
+
 
 
 @Autonomous(name="Sensing for dum dums", group="ops")
@@ -68,25 +106,29 @@ public class auto extends LinearOpMode {
 
 
 //------------------------------Drive-Paths-Below-------------------------------------------------\\
-
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         if (pipeline.getAnalysis()>pipeline.FOUR_RING_THRESHOLD)
         {
 
-            robot.driveTrain.frontRightMotor.setPower(.1);
-            robot.driveTrain.frontLeftMotor.setPower(.1);
-            robot.driveTrain.backRightMotor.setPower(.1);
-            robot.driveTrain.backLeftMotor.setPower(.1);
+            Trajectory traj = drive.trajectoryBuilder(new Pose2d())
+                    .splineTo(new Vector2d(30,30),0)
+                    .addDisplacementMarker(() -> {})
+                    .splineTo(new Vector2d(-30,-30),0)
+                    .build();
 
-            sleep(3000);
-
-            robot.driveTrain.frontRightMotor.setPower(0);
-            robot.driveTrain.frontLeftMotor.setPower(0);
-            robot.driveTrain.backRightMotor.setPower(0);
-            robot.driveTrain.backLeftMotor.setPower(0);
+            drive.followTrajectory(traj);
 
         }
         else if (pipeline.getAnalysis()>pipeline.ONE_RING_THRESHOLD)
-        { }
+        {
+            Trajectory traj = drive.trajectoryBuilder(new Pose2d())
+                    .splineTo(new Vector2d(-30, 0), 0)
+                    .addDisplacementMarker(() -> {})
+                    .splineTo(new Vector2d(30,0), 0)
+                    .build();
+
+            drive.followTrajectory(traj);
+        }
         else
         { }
 
