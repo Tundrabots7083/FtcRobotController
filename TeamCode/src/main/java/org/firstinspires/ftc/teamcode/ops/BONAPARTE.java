@@ -36,7 +36,8 @@ public class BONAPARTE extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        robot.initAll();
+        robot.shooter.init();
+        robot.loader.init();
         robot.driveTrain.init(DriveTrain.InitType.INIT_4WD);
         robot.intake.init();
 
