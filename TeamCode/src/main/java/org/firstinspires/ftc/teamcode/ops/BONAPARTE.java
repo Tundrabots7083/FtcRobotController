@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.ops;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.components.DriveTrain;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 
 @TeleOp(name = "BONAPARTE", group = "ops")
@@ -62,6 +64,13 @@ public class BONAPARTE extends LinearOpMode {
 
         robot.logger.logInfo("runOpMode", "===== [ Initialization Complete ]");
         telemetry.update();
+
+
+        robot.driveTrain.backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.driveTrain.backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        robot.driveTrain.frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.driveTrain.frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -191,8 +200,14 @@ public class BONAPARTE extends LinearOpMode {
         robot.driveTrain.frontRightMotor.setPower(frontRightPower);
 
         telemetry.addData("angle", angle);
+        telemetry.addData("front encoder",robot.driveTrain.backLeftMotor.getCurrentPosition());
+        telemetry.addData("left encoder",robot.driveTrain.frontLeftMotor.getCurrentPosition());
+        telemetry.addData("right encoder",robot.driveTrain.backRightMotor.getCurrentPosition());
+
+
         telemetry.update();
     }
+
 
     public double AngleWrapDeg(double degrees) {
         while (degrees < -180) {

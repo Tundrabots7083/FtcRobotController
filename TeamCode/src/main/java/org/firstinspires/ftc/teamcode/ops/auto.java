@@ -82,6 +82,8 @@ public class auto extends LinearOpMode {
         {
 
 
+
+
             Intake.setPower(1);
 
         }
