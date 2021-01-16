@@ -68,7 +68,6 @@ public class BONAPARTE extends LinearOpMode {
 
         robot.driveTrain.backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.driveTrain.backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
         robot.driveTrain.frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.driveTrain.frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -200,8 +199,8 @@ public class BONAPARTE extends LinearOpMode {
         robot.driveTrain.frontRightMotor.setPower(frontRightPower);
 
         telemetry.addData("angle", angle);
-        telemetry.addData("front encoder",robot.driveTrain.backLeftMotor.getCurrentPosition());
-        telemetry.addData("left encoder",robot.driveTrain.frontLeftMotor.getCurrentPosition());
+        telemetry.addData("front encoder",robot.driveTrain.backLeftMotor.getCurrentPosition()*-1);
+        telemetry.addData("left encoder",robot.driveTrain.frontLeftMotor.getCurrentPosition()*-1);
         telemetry.addData("right encoder",robot.driveTrain.backRightMotor.getCurrentPosition());
 
 

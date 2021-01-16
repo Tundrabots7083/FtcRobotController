@@ -25,6 +25,7 @@ import java.util.List;
  *    \--------------/
  *
  */
+
 @Config
 public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer {
     public static double TICKS_PER_REV = 8192;
@@ -43,9 +44,9 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
                 new Pose2d(FORWARD_OFFSET, 0, Math.toRadians(90)) // front
         ));
 
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "backLeftMotor"));
-        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontLeftMotor"));
-        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "backRightMotor"));
+        leftEncoder  = new Encoder(hardwareMap.get(DcMotorEx.class, "frontLeftMotor"));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "backRightMotor"));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "backLeftMotor"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
     }
