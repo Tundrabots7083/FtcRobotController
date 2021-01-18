@@ -32,6 +32,8 @@ public class TestPathing extends LinearOpMode {
 
         drive.followTrajectory(movement1);
 
+        /*
+
         //movement 2
         Trajectory movement2 = drive.trajectoryBuilder(new Pose2d())
                 .splineTo(new Vector2d(-40, -30), 0)
@@ -74,6 +76,7 @@ public class TestPathing extends LinearOpMode {
 
         drive.followTrajectory(movement7);
 
+        */
 
         Pose2d poseEstimate = drive.getPoseEstimate();
         telemetry.addData("finalX", poseEstimate.getX());
