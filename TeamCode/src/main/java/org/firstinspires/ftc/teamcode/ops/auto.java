@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.ops;
 
+        import com.acmerobotics.roadrunner.geometry.Pose2d;
+        import com.acmerobotics.roadrunner.geometry.Vector2d;
+        import com.acmerobotics.roadrunner.trajectory.Trajectory;
         import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
         import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
         import com.qualcomm.robotcore.hardware.DcMotor;
@@ -7,6 +10,7 @@ package org.firstinspires.ftc.teamcode.ops;
 
         import org.firstinspires.ftc.robotcore.internal.usb.exception.RobotUsbTimeoutException;
         import org.firstinspires.ftc.teamcode.bots.TestBot;
+        import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
         import org.opencv.core.Core;
         import org.opencv.core.Mat;
         import org.opencv.core.Point;
@@ -40,6 +44,8 @@ public class auto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         Intake = hardwareMap.dcMotor.get("rightIntake");
+
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
 
 
@@ -90,7 +96,12 @@ public class auto extends LinearOpMode {
         else if (pipeline.getAnalysis()>pipeline.ONE_RING_THRESHOLD)
         { }
         else
-        { }
+        {
+            Trajectory moveToShootPos = drive.trajectoryBuilder(new Pose2d())
+                    .splineTo(new Vector2d(64, 0), 0)
+                    .build();
+            drive.followTrajectory(moveToShootPos);
+        }
 
     }
 
