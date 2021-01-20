@@ -25,22 +25,28 @@ public class BONAPARTE extends LinearOpMode {
 
 
     public DcMotor Intake = null;
-    public DcMotor Shooter1 = null;
-    public DcMotor Shooter2 = null;
+    public DcMotorEx Shooter1 = null;
+    public DcMotorEx Shooter2 = null;
     public Servo ShootAngle = null;
     public Servo loader = null;
     public Servo indexer = null;
     public Servo wobbleArm = null;
     public Servo wobbleClaw = null;
 
+    public final double shootingSpeed = 8400;
+    public final double seconds_in_a_minute_i_hope = 60;
+    public final double ticks_per_rotation = 28 / 2; // 0.5:1 ratio of 28 cpr encoder
+    public final double shootingSpeedConversionIthink = (shootingSpeed * ticks_per_rotation) / seconds_in_a_minute_i_hope;
 
     @Override
     public void runOpMode() {
 
 
         Intake = hardwareMap.dcMotor.get("rightIntake");
-        Shooter1 = hardwareMap.dcMotor.get("shooterOne");
-        Shooter2 = hardwareMap.dcMotor.get("shooterTwo");
+        Shooter1 = hardwareMap.get(DcMotorEx.class,"shooterOne");
+        Shooter2 = hardwareMap.get(DcMotorEx.class,"shooterTwo");
+
+
         loader = hardwareMap.servo.get("loader");
         ShootAngle = hardwareMap.servo.get("shooterAngle");
         indexer = hardwareMap.servo.get("indexer");
@@ -50,8 +56,8 @@ public class BONAPARTE extends LinearOpMode {
 
         //Reverse spins motors to the right Forward spins motors to the left
         Intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        Shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
-        Shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
+        Shooter1.setDirection(DcMotorSimple.Direction.REVERSE);
+        Shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
@@ -70,6 +76,14 @@ public class BONAPARTE extends LinearOpMode {
         robot.driveTrain.backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.driveTrain.frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.driveTrain.frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        Shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // brake behavior so we can stop shooter quicker
+        Shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -101,8 +115,8 @@ public class BONAPARTE extends LinearOpMode {
 
             //shooter on and indexer to up position
             if (gamepad1.left_bumper) {
-                Shooter1.setPower(-.7);
-                Shooter2.setPower(-.7);
+                Shooter1.setVelocity(shootingSpeedConversionIthink);
+                Shooter2.setPower(Shooter1.getPower());
                 indexer.setPosition(1);
             }
 
