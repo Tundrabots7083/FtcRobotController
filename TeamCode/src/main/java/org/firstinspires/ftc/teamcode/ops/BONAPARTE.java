@@ -193,6 +193,50 @@ public class BONAPARTE extends LinearOpMode {
         double backLeftPower = input.magnitude() * Math.sin(theta - Math.PI / 4) + turnSpeed;
         double backRightPower = input.magnitude() * Math.sin(theta + Math.PI / 4) - turnSpeed;
 
+
+
+        // scale the motor powers by the magnitude of the inputs
+        if (input.magnitude() != 0) {
+            double maxMagnitude = Math.abs(frontLeftPower);
+            if (Math.abs(frontRightPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(frontRightPower);
+            }
+            if (Math.abs(backLeftPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(backLeftPower);
+            }
+            if (Math.abs(backRightPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(backLeftPower);
+            }
+
+            frontRightPower = (frontRightPower / maxMagnitude) * input.magnitude();
+            frontLeftPower = (frontLeftPower / maxMagnitude) * input.magnitude();
+            backRightPower = (backRightPower / maxMagnitude) * input.magnitude();
+            backLeftPower = (backLeftPower / maxMagnitude) * input.magnitude();
+
+        } else {
+            double maxMagnitude = Math.abs(frontLeftPower);
+            if (Math.abs(frontRightPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(frontRightPower);
+            }
+            if (Math.abs(backLeftPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(backLeftPower);
+            }
+            if (Math.abs(backRightPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(backLeftPower);
+            }
+
+            frontRightPower = (frontRightPower / maxMagnitude);
+            frontLeftPower = (frontLeftPower / maxMagnitude);
+            backRightPower = (backRightPower / maxMagnitude);
+            backLeftPower = (backLeftPower / maxMagnitude);
+        }
+
+        frontLeftPower += turnSpeed;
+        frontRightPower -= turnSpeed;
+        backLeftPower += turnSpeed;
+        backRightPower -= turnSpeed;
+
+
         robot.driveTrain.backLeftMotor.setPower(backLeftPower);
         robot.driveTrain.backRightMotor.setPower(backRightPower);
         robot.driveTrain.frontLeftMotor.setPower(frontLeftPower);
