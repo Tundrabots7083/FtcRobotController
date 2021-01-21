@@ -87,20 +87,109 @@ public class auto extends LinearOpMode {
         if (pipeline.getAnalysis()>pipeline.FOUR_RING_THRESHOLD)
         {
 
-
-
-
-            Intake.setPower(1);
-
+/* Trajectory moveToShootPos = drive.trajectoryBuilder(new Pose2d())
+                    .splineTo(new Vector2d(64, 0), 0)
+                    .build();
+            drive.followTrajectory(moveToShootPos);
+        */
         }
         else if (pipeline.getAnalysis()>pipeline.ONE_RING_THRESHOLD)
         { }
         else
         {
-            Trajectory moveToShootPos = drive.trajectoryBuilder(new Pose2d())
+            // starting position
+
+/*            Trajectory moveToShootPos = drive.trajectoryBuilder(new Pose2d())
                     .splineTo(new Vector2d(64, 0), 0)
                     .build();
             drive.followTrajectory(moveToShootPos);
+
+
+
+
+            Vector2d myVector = new Vector2d(10, -5);
+
+            Pose2d myPose = new Pose2d(10, -5, Math.toRadians(90));
+
+            Trajectory myTrajectory = drive.trajectoryBuilder(new Pose2d(5, -4, Math.toRadians(90)))
+                    .strafeRight(10)
+                    .back(5)
+                    .build();
+
+            waitForStart();
+
+            if(isStopRequested()) return; */
+/**
+ //movement 1
+ drive.followTrajectory(myTrajectory);
+
+ //movement 2
+ drive.followTrajectory(myTrajectory);
+ **/
+
+/*
+            Trajectory traj1 = drive.trajectoryBuilder(new Pose2d())
+                    .strafeRight(10)
+                    .build();
+
+            Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
+                    .forward(5)
+                    .build();
+
+            waitForStart();
+
+            if(isStopRequested()) return;
+
+            drive.followTrajectory(traj1);
+            drive.followTrajectory(traj2);
+*/
+            drive.setPoseEstimate(new Pose2d(-63, -42, 0));
+//movement 1
+
+            Trajectory traj = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
+                    .splineTo(new Vector2d(-3, -36), 0)
+                    .build();
+
+            drive.followTrajectory(traj);
+//shoot
+
+            sleep(3000);
+
+            //movement 2
+            Trajectory traj1 = drive.trajectoryBuilder(new Pose2d(-3, -36, 0))
+                    .splineTo(new Vector2d(-3, -60), 0)
+                    .build();
+            drive.followTrajectory(traj1);
+
+            sleep(3000);
+
+            //movement 3
+
+            Trajectory traj3 = drive.trajectoryBuilder(new Pose2d(-3, -60, 0))
+                    .splineTo(new Vector2d(-35, -32), 0)
+                    .build();
+            drive.followTrajectory(traj3);
+
+            sleep(3000);
+
+            //movement 4
+
+            Trajectory traj4 = drive.trajectoryBuilder(new Pose2d(-35, -32, 0))
+                    .splineTo(new Vector2d(-3, -60), 0)
+                    .build();
+            drive.followTrajectory(traj4);
+
+            sleep(3000);
+
+
+            Trajectory traj5 = drive.trajectoryBuilder(new Pose2d(-3, -60, 0))
+                    .splineTo(new Vector2d(10, -24), 0)
+                    .build();
+            drive.followTrajectory(traj5);
+
+            sleep(3000);
+
+            Intake.setPower(1);
         }
 
     }
