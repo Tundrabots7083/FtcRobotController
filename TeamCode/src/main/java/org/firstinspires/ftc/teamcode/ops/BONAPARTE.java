@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.ops;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -11,10 +10,10 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.components.DriveTrain;
-import org.firstinspires.ftc.teamcode.util.Encoder;
+import org.firstinspires.ftc.teamcode.components.Intake;
 
 
-@TeleOp(name = "BONAPARTE", group = "ops")
+@TeleOp(name="BONAPARTE", group="ops")
 public class BONAPARTE extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -24,66 +23,39 @@ public class BONAPARTE extends LinearOpMode {
 
 
 
-    public DcMotor Intake = null;
-    public DcMotorEx Shooter1 = null;
-    public DcMotorEx Shooter2 = null;
-    public Servo ShootAngle = null;
-    public Servo loader = null;
-    public Servo indexer = null;
-    public Servo wobbleArm = null;
-    public Servo wobbleClaw = null;
 
-    public final double shootingSpeed = 8400;
-    public final double seconds_in_a_minute_i_hope = 60;
-    public final double ticks_per_rotation = 28 / 2; // 0.5:1 ratio of 28 cpr encoder
-    public final double shootingSpeedConversionIthink = (shootingSpeed * ticks_per_rotation) / seconds_in_a_minute_i_hope;
+
+    //------------------------------InitSetup?--------------------------------------------------------\\
+
+
+
+
+
+
 
     @Override
     public void runOpMode() {
 
+        robot.shooter.init();
+        robot.loader.init();
+        robot.driveTrain.init(DriveTrain.InitType.INIT_4WD);
+        robot.intake.init();
 
-        Intake = hardwareMap.dcMotor.get("rightIntake");
-        Shooter1 = hardwareMap.get(DcMotorEx.class,"shooterOne");
-        Shooter2 = hardwareMap.get(DcMotorEx.class,"shooterTwo");
-
-
-        loader = hardwareMap.servo.get("loader");
-        ShootAngle = hardwareMap.servo.get("shooterAngle");
-        indexer = hardwareMap.servo.get("indexer");
-        wobbleArm = hardwareMap.servo.get("wobbleArm");
-        wobbleClaw = hardwareMap.servo.get("wobbleClaw");
-
+//------------------------------Direction---------------------------------------------------------\\
 
         //Reverse spins motors to the right Forward spins motors to the left
-        Intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        Shooter1.setDirection(DcMotorSimple.Direction.REVERSE);
-        Shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
+        /*Intake     .setDirection (DcMotorSimple.Direction.REVERSE);
+        Shooter1   .setDirection (DcMotorSimple.Direction.FORWARD);
+        Shooter2   .setDirection (DcMotorSimple.Direction.FORWARD); */
 
 
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
         robot.logger.logInfo("runOpMode", "===== [ Start Initializing ]");
 
         /* Use either robot.initAll or select only the components that need initializing below */
-        robot.initAll();
-        robot.driveTrain.init(DriveTrain.InitType.INIT_4WD);
-        robot.intake.init();
 
         robot.logger.logInfo("runOpMode", "===== [ Initialization Complete ]");
         telemetry.update();
-
-
-        robot.driveTrain.backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.driveTrain.backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.driveTrain.frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.driveTrain.frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        Shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        // brake behavior so we can stop shooter quicker
-        Shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -92,89 +64,70 @@ public class BONAPARTE extends LinearOpMode {
         runtime.reset();
 
 
+
+
+//------------------------------Wobble------------------------------------------------------------\\
+//non existent just bad
+
         while (opModeIsActive()) {
 
             //field oriented gamepad stuff
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
-            //intake on and indexer to down postiion
-            if (gamepad1.right_trigger > .1) {
-                indexer.setPosition(.65);
-                Intake.setPower(1);
+            //sketchy intake code idk if work
+            if      (gamepad1.right_trigger > .1)
+            {
+                robot.loader.indexer.setPosition(.65);
+                robot.intake.setIntakePower(1);
+            }
+            else if (gamepad1.left_trigger  > .1)
+            {
+                robot.intake.setIntakePower(-1);
+            }
+            else
+            {
+                robot.intake.setIntakePower(0);
             }
 
-            //intake backwards
-            else if (gamepad1.left_trigger > .1) {
-                Intake.setPower(-1);
+            if (gamepad1.left_bumper)
+            {
+                robot.shooter.setShooterPower(-.8);
+                robot.loader.indexer.setPosition(1);
+            }
+            else
+            {
+                robot.shooter.setShooterPower(0);
             }
 
-            //intake off
-            else {
-                Intake.setPower(0);
-            }
-
-            //shooter on and indexer to up position
-            if (gamepad1.left_bumper) {
-                Shooter1.setVelocity(shootingSpeedConversionIthink);
-                Shooter2.setPower(Shooter1.getPower());
-                indexer.setPosition(1);
-            }
-
-            //shooter off
-            else {
-                Shooter1.setPower(0);
-                Shooter2.setPower(0);
-            }
-
-            //loader out position
-            if (gamepad1.right_bumper) {
+            if (gamepad1.right_bumper)
+            {
                 //change values
-                loader.setPosition(.5);
+                robot.loader.loaderServo.setPosition(.5);
             }
-
-            //loader in position
-            else {
+            else
+            {
                 //change value
-                loader.setPosition(.83);
+                robot.loader.loaderServo.setPosition(.83);
             }
 
-            //highgoal position
-            if (gamepad1.dpad_down) {
+            if     (gamepad1.y)
+            {
+                robot.loader.indexer.setPosition(.65);
+            }
+            else if(gamepad1.b)
+            {
+                robot.loader.indexer.setPosition(1);
+            }
+
+            if      (gamepad1.dpad_down)
+            {
                 //change values
-                ShootAngle.setPosition(.8);
+                robot.shooter.ShootAngle.setPosition(.75);
             }
-
-            //powershot position
-            if (gamepad1.dpad_right) {
+            else if (gamepad1.dpad_up)
+            {
                 //change values
-                ShootAngle.setPosition(.78);
-            }
-
-            //highest position
-            else if (gamepad1.dpad_up) {
-                //change values
-                ShootAngle.setPosition(1);
-            }
-
-            //wobble goal arm down
-            if (gamepad1.x){
-                //change values
-                wobbleArm.setPosition(.45);
-            }
-            // wobble arm up
-            else if (gamepad1.a) {
-                //change values
-                wobbleArm.setPosition(.05);
-            }
-
-            //wobble claw open
-            if (gamepad1.y) {
-                wobbleClaw.setPosition(.4);
-            }
-
-            //wobble claw close
-            else if (gamepad1.b) {
-                wobbleClaw.setPosition(.15);
+                robot.shooter.ShootAngle.setPosition(1);
             }
 
         }
@@ -182,21 +135,20 @@ public class BONAPARTE extends LinearOpMode {
 
     /**
      * real gamer field relative driving
-     *
      * @param ySpeed
      * @param xSpeed
      * @param turnSpeed
      **/
     public void FieldRelative(double ySpeed, double xSpeed, double turnSpeed) {
         double angle = robot.gyroNavigator.getAngleGood();
-        angle = AngleWrapDeg(angle);
+        angle  = AngleWrapDeg(angle);
         angle = -angle;
 
         xSpeed = Range.clip(xSpeed, -1, 1);
-        ySpeed = Range.clip(ySpeed, -1, 1);
-        turnSpeed = Range.clip(turnSpeed, -1, 1);
+        ySpeed = Range.clip(ySpeed, -1, 1 );
+        turnSpeed = Range.clip(turnSpeed, -1, 1 );
 
-        org.firstinspires.ftc.teamcode.geometry.Vector2d input = new org.firstinspires.ftc.teamcode.geometry.Vector2d(xSpeed, ySpeed);
+        org.firstinspires.ftc.teamcode.geometry.Vector2d input = new org.firstinspires.ftc.teamcode.geometry.Vector2d(xSpeed,ySpeed);
 
         input = input.rotateBy(angle);
 
@@ -207,70 +159,20 @@ public class BONAPARTE extends LinearOpMode {
         double backLeftPower = input.magnitude() * Math.sin(theta - Math.PI / 4) + turnSpeed;
         double backRightPower = input.magnitude() * Math.sin(theta + Math.PI / 4) - turnSpeed;
 
-
-
-        // scale the motor powers by the magnitude of the inputs
-        if (input.magnitude() != 0) {
-            double maxMagnitude = Math.abs(frontLeftPower);
-            if (Math.abs(frontRightPower) > maxMagnitude) {
-                maxMagnitude = Math.abs(frontRightPower);
-            }
-            if (Math.abs(backLeftPower) > maxMagnitude) {
-                maxMagnitude = Math.abs(backLeftPower);
-            }
-            if (Math.abs(backRightPower) > maxMagnitude) {
-                maxMagnitude = Math.abs(backLeftPower);
-            }
-
-            frontRightPower = (frontRightPower / maxMagnitude) * input.magnitude();
-            frontLeftPower = (frontLeftPower / maxMagnitude) * input.magnitude();
-            backRightPower = (backRightPower / maxMagnitude) * input.magnitude();
-            backLeftPower = (backLeftPower / maxMagnitude) * input.magnitude();
-
-        } else {
-            double maxMagnitude = Math.abs(frontLeftPower);
-            if (Math.abs(frontRightPower) > maxMagnitude) {
-                maxMagnitude = Math.abs(frontRightPower);
-            }
-            if (Math.abs(backLeftPower) > maxMagnitude) {
-                maxMagnitude = Math.abs(backLeftPower);
-            }
-            if (Math.abs(backRightPower) > maxMagnitude) {
-                maxMagnitude = Math.abs(backLeftPower);
-            }
-
-            frontRightPower = (frontRightPower / maxMagnitude);
-            frontLeftPower = (frontLeftPower / maxMagnitude);
-            backRightPower = (backRightPower / maxMagnitude);
-            backLeftPower = (backLeftPower / maxMagnitude);
-        }
-
-        frontLeftPower += turnSpeed;
-        frontRightPower -= turnSpeed;
-        backLeftPower += turnSpeed;
-        backRightPower -= turnSpeed;
-
-
         robot.driveTrain.backLeftMotor.setPower(backLeftPower);
         robot.driveTrain.backRightMotor.setPower(backRightPower);
         robot.driveTrain.frontLeftMotor.setPower(frontLeftPower);
         robot.driveTrain.frontRightMotor.setPower(frontRightPower);
 
-        telemetry.addData("angle", angle);
-        telemetry.addData("front encoder",robot.driveTrain.backLeftMotor.getCurrentPosition()*-1);
-        telemetry.addData("left encoder",robot.driveTrain.frontLeftMotor.getCurrentPosition()*-1);
-        telemetry.addData("right encoder",robot.driveTrain.backRightMotor.getCurrentPosition());
-
-
+        telemetry.addData("angle",angle);
         telemetry.update();
     }
 
-
     public double AngleWrapDeg(double degrees) {
-        while (degrees < -180) {
+        while (degrees < -180 ) {
             degrees += 2.0 * 180;
         }
-        while (degrees > 180) {
+        while (degrees > 180 ) {
             degrees -= 2.0 * 180;
         }
         return degrees;

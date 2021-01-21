@@ -11,7 +11,9 @@ import org.firstinspires.ftc.teamcode.components.DriveTrain;
 public class Loader extends BotComponent {
 
     public Servo loaderServo = null;
+    public Servo   indexer    = null;
     private String servoName;
+    private String indexerName;
     double SERVO_IN_POSITION = .75;
     double SERVO_OUT_POSITION = .25;
 
@@ -23,16 +25,21 @@ public class Loader extends BotComponent {
     }
 
     public Loader(Logger aLogger, OpMode aOpMode,
-                  String loader) {
+                  String aLoader, String aIndexer) {
         super(aLogger, aOpMode);
-        servoName = loader;
+        servoName = aLoader;
+        indexerName = aIndexer;
     }
 
 
     public void init(){
         logger.logDebug("initservo", "orangr");
         loaderServo = initServo(servoName, SERVO_IN_POSITION);
+        indexer = initServo(indexerName, .65);
         if(loaderServo != null){
+            isAvailable = true;
+        }
+        if(indexer != null){
             isAvailable = true;
         }
 
