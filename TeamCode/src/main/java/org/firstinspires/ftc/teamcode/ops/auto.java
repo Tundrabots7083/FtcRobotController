@@ -26,7 +26,7 @@ package org.firstinspires.ftc.teamcode.ops;
 
 
 
-@Autonomous(name="Sensing for dum dums", group="ops")
+@Autonomous(name="auto", group="ops")
 public class auto extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -47,7 +47,8 @@ public class auto extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-
+        robot.shooter.init();
+        robot.loader.init();
 
         //Dont look unless broken
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -151,6 +152,13 @@ public class auto extends LinearOpMode {
                     .build();
 
             drive.followTrajectory(traj);
+
+            robot.loader.indexer.setPosition(.65);
+            robot.shooter.setShooterPower(.6);
+            robot.loader.load();
+            robot.loader.load();
+            robot.loader.load();
+            robot.shooter.setShooterPower(0);
 //shoot
 
             sleep(3000);
