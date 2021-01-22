@@ -11,9 +11,13 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.components.DriveTrain;
 import org.firstinspires.ftc.teamcode.components.Intake;
+import org.firstinspires.ftc.teamcode.components.Loader;
+import org.firstinspires.ftc.teamcode.components.Shooter;
+import org.firstinspires.ftc.teamcode.geometry.Vector2d;
 
 
-@TeleOp(name="BONAPARTE", group="ops")
+
+@TeleOp(name="BONAPARTe", group="ops")
 public class BONAPARTE extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -28,18 +32,9 @@ public class BONAPARTE extends LinearOpMode {
     //------------------------------InitSetup?--------------------------------------------------------\\
 
 
-
-
-
-
-
     @Override
     public void runOpMode() {
 
-        robot.shooter.init();
-        robot.loader.init();
-        robot.driveTrain.init(DriveTrain.InitType.INIT_4WD);
-        robot.intake.init();
 
 //------------------------------Direction---------------------------------------------------------\\
 
@@ -59,15 +54,16 @@ public class BONAPARTE extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        robot.shooter.init();
+        robot.loader.init();
+        robot.intake.init();
+        robot.driveTrain.init(DriveTrain.InitType.INIT_4WD);
+        robot.gyroNavigator.init();
 
         robot.logger.logInfo("runOpMode", "===== [ Start TeleOp ]");
         runtime.reset();
 
 
-
-
-//------------------------------Wobble------------------------------------------------------------\\
-//non existent just bad
 
         while (opModeIsActive()) {
 
@@ -139,6 +135,7 @@ public class BONAPARTE extends LinearOpMode {
      * @param xSpeed
      * @param turnSpeed
      **/
+
     public void FieldRelative(double ySpeed, double xSpeed, double turnSpeed) {
         double angle = robot.gyroNavigator.getAngleGood();
         angle  = AngleWrapDeg(angle);

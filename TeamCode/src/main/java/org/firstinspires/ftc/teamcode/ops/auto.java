@@ -23,6 +23,8 @@ package org.firstinspires.ftc.teamcode.ops;
         import org.openftc.easyopencv.OpenCvCamera;
         import org.openftc.easyopencv.OpenCvCameraFactory;
         import org.openftc.easyopencv.OpenCvCameraRotation;
+        import org.firstinspires.ftc.teamcode.components.Shooter;
+        import org.firstinspires.ftc.teamcode.components.Loader;
 
 
 
@@ -45,10 +47,12 @@ public class auto extends LinearOpMode {
 
         Intake = hardwareMap.dcMotor.get("rightIntake");
 
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        robot = new TestBot(this, logEnableTrace, logToTelemetry);
 
         robot.shooter.init();
         robot.loader.init();
+
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         //Dont look unless broken
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -71,6 +75,7 @@ public class auto extends LinearOpMode {
         });
 
         waitForStart();
+
 
 // uncomment while loop to tweak camera comment for robot to sense then do drive paths
       /*  while (opModeIsActive()){
@@ -149,19 +154,51 @@ public class auto extends LinearOpMode {
 
             Trajectory traj = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
                     .splineTo(new Vector2d(-3, -36), 0)
+                    .splineTo(new Vector2d(-3, -60), 0)
+                    .splineTo(new Vector2d(-35, -32), 0)
+                    .splineTo(new Vector2d(-3, -60), 0)
+                    .splineTo(new Vector2d(10, -24), 0)
+                    .addTemporalMarker(1, () -> {
+                        robot.loader.indexer.setPosition(1);
+                        robot.shooter.setShooterPower(.6);
+                    })
+                    .addTemporalMarker(1.4, () -> {
+                        robot.loader.loaderServo.setPosition(.5);
+                    })
+                    .addTemporalMarker(1.8, () -> {
+                        robot.loader.loaderServo.setPosition(.83);
+                    })
+                    .addTemporalMarker(2.2, () -> {
+                        robot.loader.loaderServo.setPosition(.5);
+                    })
+                    .addTemporalMarker(2.6, () -> {
+                        robot.loader.loaderServo.setPosition(.83);
+                    })
+                    .addTemporalMarker(3, () -> {
+                        robot.loader.loaderServo.setPosition(.5);
+                    })
+                    .addTemporalMarker(3.4, () -> {
+                        robot.loader.loaderServo.setPosition(.83);
+                    })
+                    .addTemporalMarker(3.8, () -> {
+                        robot.shooter.setShooterPower(0);
+                    })
                     .build();
 
             drive.followTrajectory(traj);
 
-            robot.loader.indexer.setPosition(.65);
+            /*robot.loader.indexer.setPosition(1);
             robot.shooter.setShooterPower(.6);
-            robot.loader.load();
-            robot.loader.load();
-            robot.loader.load();
-            robot.shooter.setShooterPower(0);
+            robot.loader.loaderServo.setPosition(.5);
+            robot.loader.loaderServo.setPosition(.83);
+            robot.loader.loaderServo.setPosition(.5);
+            robot.loader.loaderServo.setPosition(.83);
+            robot.loader.loaderServo.setPosition(.5);
+            robot.loader.loaderServo.setPosition(.83);
+            robot.shooter.setShooterPower(0);*/
 //shoot
 
-            sleep(3000);
+            /*sleep(3000);
 
             //movement 2
             Trajectory traj1 = drive.trajectoryBuilder(new Pose2d(-3, -36, 0))
@@ -197,7 +234,7 @@ public class auto extends LinearOpMode {
 
             sleep(3000);
 
-            Intake.setPower(1);
+            Intake.setPower(1);*/
         }
 
     }
