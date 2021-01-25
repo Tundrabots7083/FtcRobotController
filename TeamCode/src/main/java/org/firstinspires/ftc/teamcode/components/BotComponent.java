@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.components;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -69,10 +70,37 @@ public class BotComponent {
         return initMotor(motorName, direction, false);
     }
 
+    public DcMotorEx initMotorEx(String motorName, DcMotorEx.Direction direction) {
+        return initMotorEx(motorName,direction,false);
+    }
+
     public DcMotor initMotor(String motorName, DcMotorSimple.Direction direction, boolean resetEncoder) {
         try {
             HardwareMap ahwMap = opMode.hardwareMap;
             DcMotor motor = ahwMap.get(DcMotor.class, motorName);
+
+            motor.setDirection(direction);
+            motor.setPower(0);
+            if (resetEncoder) {
+                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            } else {
+                motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+
+            return (motor);
+
+        } catch (NullPointerException | IllegalArgumentException err) {
+            if (opMode.telemetry != null) {
+                logger.logErr("initMotor","Error: %s", err.getMessage());
+            }
+            return null;
+        }
+    }
+    public DcMotorEx initMotorEx(String motorName, DcMotorEx.Direction direction, boolean resetEncoder) {
+        try {
+            HardwareMap ahwMap = opMode.hardwareMap;
+            DcMotorEx motor = ahwMap.get(DcMotorEx.class, motorName);
 
             motor.setDirection(direction);
             motor.setPower(0);

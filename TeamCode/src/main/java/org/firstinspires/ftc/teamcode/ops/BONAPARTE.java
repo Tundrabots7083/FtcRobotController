@@ -28,6 +28,9 @@ public class BONAPARTE extends LinearOpMode {
     private boolean logToTelemetry = true;
 
 
+    private double SHOOTER_RPM = 9600;
+    private double TICKS_PER_ROTATION = 14;
+    private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
 
     public Servo wobbleArm;
     public Servo wobbleClaw;
@@ -76,7 +79,7 @@ public class BONAPARTE extends LinearOpMode {
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
             //sketchy intake code idk if work
-            if      (gamepad1.right_trigger > .1)
+            if (gamepad1.right_trigger > .1)
             {
                 robot.loader.indexer.setPosition(.65);
                 robot.intake.setIntakePower(1);
@@ -92,12 +95,12 @@ public class BONAPARTE extends LinearOpMode {
 
             if (gamepad1.left_bumper)
             {
-                robot.shooter.setShooterPower(-.8);
+                robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
                 robot.loader.indexer.setPosition(1);
             }
             else
             {
-                robot.shooter.setShooterPower(0);
+                robot.shooter.setShooterVelocity(0);
             }
 
             if (gamepad1.right_bumper)
@@ -164,6 +167,42 @@ public class BONAPARTE extends LinearOpMode {
         double frontRightPower = input.magnitude() * Math.sin(theta - Math.PI / 4) - turnSpeed;
         double backLeftPower = input.magnitude() * Math.sin(theta - Math.PI / 4) + turnSpeed;
         double backRightPower = input.magnitude() * Math.sin(theta + Math.PI / 4) - turnSpeed;
+
+        if (input.magnitude() != 0) {
+            double maxMagnitude = Math.abs(frontLeftPower);
+            if (Math.abs(frontRightPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(frontRightPower);
+            }
+            if (Math.abs(backLeftPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(backLeftPower);
+            }
+            if (Math.abs(backRightPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(backLeftPower);
+            }
+
+            frontRightPower = (frontRightPower / maxMagnitude) * input.magnitude();
+            frontLeftPower = (frontLeftPower / maxMagnitude) * input.magnitude();
+            backRightPower = (backRightPower / maxMagnitude) * input.magnitude();
+            backLeftPower = (backLeftPower / maxMagnitude) * input.magnitude();
+
+        } else {
+            double maxMagnitude = Math.abs(frontLeftPower);
+            if (Math.abs(frontRightPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(frontRightPower);
+            }
+            if (Math.abs(backLeftPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(backLeftPower);
+            }
+            if (Math.abs(backRightPower) > maxMagnitude) {
+                maxMagnitude = Math.abs(backLeftPower);
+            }
+
+            frontRightPower = (frontRightPower / maxMagnitude);
+            frontLeftPower = (frontLeftPower / maxMagnitude);
+            backRightPower = (backRightPower / maxMagnitude);
+            backLeftPower = (backLeftPower / maxMagnitude);
+        }
+
 
         robot.driveTrain.backLeftMotor.setPower(backLeftPower);
         robot.driveTrain.backRightMotor.setPower(backRightPower);

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.components;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -13,8 +14,8 @@ public class Shooter extends BotComponent {
     private String shooterAngle;
 
 
-    public DcMotor Shooter1 = null;
-    public DcMotor Shooter2 = null;
+    public DcMotorEx Shooter1 = null;
+    public DcMotorEx Shooter2 = null;
     public Servo ShootAngle = null;
 
 
@@ -42,8 +43,8 @@ public class Shooter extends BotComponent {
 
         //define and initialize motors
 
-        Shooter1 = initMotor(shooter1Name, DcMotor.Direction.FORWARD);
-        Shooter2 = initMotor(shooter2Name, DcMotor.Direction.FORWARD);
+        Shooter1 = initMotorEx(shooter1Name, DcMotor.Direction.REVERSE);
+        Shooter2 = initMotorEx(shooter2Name, DcMotor.Direction.REVERSE);
         ShootAngle = initServo(shooterAngle, .75);
 
 
@@ -62,11 +63,16 @@ public class Shooter extends BotComponent {
 
 
     public void setShooterPower (double power){
-        Shooter2.setPower(-power);
-        Shooter1.setPower(-power);
+        Shooter2.setPower(power);
+        Shooter1.setPower(power);
     }
 
 
+
+    public void setShooterVelocity(double velocity) {
+        Shooter1.setVelocity(velocity);
+        Shooter2.setPower(Shooter1.getPower());
+    }
 
 
 }
