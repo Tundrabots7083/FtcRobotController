@@ -69,10 +69,18 @@ public class Shooter extends BotComponent {
 
 
 
+    //
     public void setShooterVelocity(double velocity) {
         Shooter1.setVelocity(velocity);
         Shooter2.setPower(Shooter1.getPower());
     }
 
+    /**
+     * gets the shooter velocity
+     * @return shooter velocity
+     */
+    public double getShooterVelocity() {
+        return (Shooter1.getVelocity() / 14) * 60;
+    }
 
 }

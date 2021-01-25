@@ -139,6 +139,9 @@ public class BONAPARTE extends LinearOpMode {
             }
 
         }
+
+        telemetry.addData("Shooter velocity: ",robot.shooter.getShooterVelocity());
+        telemetry.update();
     }
 
     /**
@@ -209,8 +212,7 @@ public class BONAPARTE extends LinearOpMode {
         robot.driveTrain.frontLeftMotor.setPower(frontLeftPower);
         robot.driveTrain.frontRightMotor.setPower(frontRightPower);
 
-        telemetry.addData("angle",angle);
-        telemetry.update();
+
     }
 
     public double AngleWrapDeg(double degrees) {
