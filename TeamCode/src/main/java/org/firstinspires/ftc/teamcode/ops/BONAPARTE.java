@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.ops;
 
+import android.net.wifi.hotspot2.omadm.PpsMoParser;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -27,9 +29,9 @@ public class BONAPARTE extends LinearOpMode {
 
 
 
+    public Servo wobbleArm;
+    public Servo wobbleClaw;
 
-
-    //------------------------------InitSetup?--------------------------------------------------------\\
 
 
     @Override
@@ -51,6 +53,9 @@ public class BONAPARTE extends LinearOpMode {
 
         robot.logger.logInfo("runOpMode", "===== [ Initialization Complete ]");
         telemetry.update();
+
+        wobbleClaw = hardwareMap.get(Servo.class, "wobbleClaw");
+        wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -106,15 +111,6 @@ public class BONAPARTE extends LinearOpMode {
                 robot.loader.loaderServo.setPosition(.83);
             }
 
-            if     (gamepad1.y)
-            {
-                robot.loader.indexer.setPosition(.65);
-            }
-            else if(gamepad1.b)
-            {
-                robot.loader.indexer.setPosition(1);
-            }
-
             if      (gamepad1.dpad_down)
             {
                 //change values
@@ -124,6 +120,19 @@ public class BONAPARTE extends LinearOpMode {
             {
                 //change values
                 robot.shooter.ShootAngle.setPosition(1);
+            }
+
+            if     (gamepad1.y)
+            {
+                wobbleArm.setPosition(.4);
+                sleep(200);
+                wobbleClaw.setPosition(.45);
+            }
+            else if(gamepad1.b)
+            {
+                wobbleClaw.setPosition(0.15);
+                sleep(200);
+                wobbleArm.setPosition(0);
             }
 
         }
