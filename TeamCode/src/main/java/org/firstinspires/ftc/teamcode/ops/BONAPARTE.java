@@ -137,11 +137,11 @@ public class BONAPARTE extends LinearOpMode {
                 sleep(200);
                 wobbleArm.setPosition(0);
             }
-
+            telemetry.addData("Shooter velocity: ",robot.shooter.getShooterVelocity());
+            telemetry.update();
         }
 
-        telemetry.addData("Shooter velocity: ",robot.shooter.getShooterVelocity());
-        telemetry.update();
+
     }
 
     /**

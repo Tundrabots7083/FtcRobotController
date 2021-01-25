@@ -43,8 +43,8 @@ public class Shooter extends BotComponent {
 
         //define and initialize motors
 
-        Shooter1 = initMotorEx(shooter1Name, DcMotor.Direction.REVERSE);
-        Shooter2 = initMotorEx(shooter2Name, DcMotor.Direction.REVERSE);
+        Shooter1 = initMotorEx(shooter1Name, DcMotor.Direction.FORWARD);
+        Shooter2 = initMotorEx(shooter2Name, DcMotor.Direction.FORWARD);
         ShootAngle = initServo(shooterAngle, .75);
 
 
