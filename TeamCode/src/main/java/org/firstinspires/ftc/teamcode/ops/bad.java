@@ -159,11 +159,11 @@ public class bad extends LinearOpMode {
             robot.shooter.setShooterVelocity(0);
 
             //drive to zone a
-             /*Trajectory move2 = drive.trajectoryBuilder(new Pose2d(0, -42, 0))
+             Trajectory move2 = drive.trajectoryBuilder(move1.end())
                     .splineTo(new Vector2d(0, -42), 35)
                     .build();
 
-            drive.followTrajectory(move2);*/
+            drive.followTrajectory(move2);
 
             drive.turn(Math.toRadians(-30));
 
@@ -173,7 +173,7 @@ public class bad extends LinearOpMode {
             wobbleClaw.setPosition(.45);
 
             //backwards spline to pick up wobble two
-            Trajectory move3 = drive.trajectoryBuilder(new Pose2d(-40, -30, 180))
+            Trajectory move3 = drive.trajectoryBuilder(move2.end())
                     .splineTo(new Vector2d(-40, -30), 180 )
                     .build();
 
@@ -185,7 +185,7 @@ public class bad extends LinearOpMode {
             wobbleArm.setPosition(.3);
 
             //backwards spline to zone a
-            Trajectory move4 = drive.trajectoryBuilder(new Pose2d(0, -42, 315))
+            Trajectory move4 = drive.trajectoryBuilder(move3.end())
                     .splineTo(new Vector2d(0, -42), 315)
                     .build();
 
@@ -204,7 +204,7 @@ public class bad extends LinearOpMode {
             wobbleArm.setPosition(0);
 
             //forwards spline to park
-            Trajectory move5 = drive.trajectoryBuilder(new Pose2d(12, -30, 0))
+            Trajectory move5 = drive.trajectoryBuilder(move4.end())
                     .splineTo(new Vector2d(12, -30), 0)
                     .build();
 
