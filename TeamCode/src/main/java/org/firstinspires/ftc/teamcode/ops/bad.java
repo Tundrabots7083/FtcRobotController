@@ -118,13 +118,13 @@ public class bad extends LinearOpMode {
 
             //move to the launch line
             Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
-                    .splineTo(new Vector2d(-10, -42), 0)
+                    .splineTo(new Vector2d(0, -42), 0)
                     .build();
 
             drive.followTrajectory(move1);
 
             //turn on flywheel
-            robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
+            //robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
 
             //angle shooter
             robot.shooter.ShootAngle.setPosition(.75);
@@ -178,9 +178,24 @@ public class bad extends LinearOpMode {
 
             //turn towards zone a
 
+            Trajectory move2 = drive.trajectoryBuilder(move1.end())
+                    .splineTo(new Vector2d(2, -54), -30)
+                    .build();
+
+            drive.followTrajectory(move2);
+
+//            drive.turn(Math.toRadians(30));
+            sleep(1000);
+            //wobble arm down and release
+            wobbleArm.setPosition(.4);
+            sleep(1000);
+            wobbleClaw.setPosition(.45);
+            sleep(1000);
+            /*
+
+
             drive.turn(Math.toRadians(-30));
 
-            /*
 
             //drive to zone a
              Trajectory move2 = drive.trajectoryBuilder(move1.end())
