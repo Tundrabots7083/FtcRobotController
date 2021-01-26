@@ -103,54 +103,22 @@ public class auto extends LinearOpMode {
         { }
         else
         {
-            // starting position
 
-/*            Trajectory moveToShootPos = drive.trajectoryBuilder(new Pose2d())
-                    .splineTo(new Vector2d(64, 0), 0)
-                    .build();
-            drive.followTrajectory(moveToShootPos);
-
-
-
-
-            Vector2d myVector = new Vector2d(10, -5);
-
-            Pose2d myPose = new Pose2d(10, -5, Math.toRadians(90));
-
-            Trajectory myTrajectory = drive.trajectoryBuilder(new Pose2d(5, -4, Math.toRadians(90)))
-                    .strafeRight(10)
-                    .back(5)
-                    .build();
-
-            waitForStart();
-
-            if(isStopRequested()) return; */
-/**
- //movement 1
- drive.followTrajectory(myTrajectory);
-
- //movement 2
- drive.followTrajectory(myTrajectory);
- **/
-
-/*
-            Trajectory traj1 = drive.trajectoryBuilder(new Pose2d())
-                    .strafeRight(10)
-                    .build();
-
-            Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                    .forward(5)
-                    .build();
-
-            waitForStart();
-
-            if(isStopRequested()) return;
-
-            drive.followTrajectory(traj1);
-            drive.followTrajectory(traj2);
-*/
+             //set starting position
             drive.setPoseEstimate(new Pose2d(-63, -42, 0));
-//movement 1
+
+            //move to the launch line
+            Trajectory move1 = drive.trajectoryBuilder(new Pose2d(0, -63, 0))
+            .build();
+
+            //turn on flywheel
+
+            //angle shooter
+
+
+
+
+
 
             Trajectory traj = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
                     .splineTo(new Vector2d(-3, -36), 0)
@@ -185,7 +153,60 @@ public class auto extends LinearOpMode {
                     })
                     .build();
 
-            drive.followTrajectory(traj);
+
+/*
+            Trajectory traj1 = drive.trajectoryBuilder(new Pose2d())
+                    .strafeRight(10)
+                    .build();
+
+            Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
+                    .forward(5)
+                    .build();
+
+            waitForStart();
+
+            if(isStopRequested()) return;
+
+            drive.followTrajectory(traj1);
+            drive.followTrajectory(traj2);
+*/
+            drive.setPoseEstimate(new Pose2d(-63, -42, 0));
+//movement 1
+
+         /*   Trajectory traj = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
+                    .splineTo(new Vector2d(-3, -36), 0)
+                    .splineTo(new Vector2d(-3, -60), 0)
+                    .splineTo(new Vector2d(-35, -32), 0)
+                    .splineTo(new Vector2d(-3, -60), 0)
+                    .splineTo(new Vector2d(10, -24), 0)
+                    .addTemporalMarker(1, () -> {
+                        robot.loader.indexer.setPosition(1);
+                        robot.shooter.setShooterPower(.6);
+                    })
+                    .addTemporalMarker(1.4, () -> {
+                        robot.loader.loaderServo.setPosition(.5);
+                    })
+                    .addTemporalMarker(1.8, () -> {
+                        robot.loader.loaderServo.setPosition(.83);
+                    })
+                    .addTemporalMarker(2.2, () -> {
+                        robot.loader.loaderServo.setPosition(.5);
+                    })
+                    .addTemporalMarker(2.6, () -> {
+                        robot.loader.loaderServo.setPosition(.83);
+                    })
+                    .addTemporalMarker(3, () -> {
+                        robot.loader.loaderServo.setPosition(.5);
+                    })
+                    .addTemporalMarker(3.4, () -> {
+                        robot.loader.loaderServo.setPosition(.83);
+                    })
+                    .addTemporalMarker(3.8, () -> {
+                        robot.shooter.setShooterPower(0);
+                    })
+                    .build();
+
+            drive.followTrajectory(traj); */
 
             /*robot.loader.indexer.setPosition(1);
             robot.shooter.setShooterPower(.6);

@@ -27,7 +27,6 @@ public class BONAPARTE extends LinearOpMode {
     private boolean logEnableTrace = false;
     private boolean logToTelemetry = true;
 
-
     private double SHOOTER_RPM = 9600;
     private double TICKS_PER_ROTATION = 14;
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
@@ -39,15 +38,6 @@ public class BONAPARTE extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-
-//------------------------------Direction---------------------------------------------------------\\
-
-        //Reverse spins motors to the right Forward spins motors to the left
-        /*Intake     .setDirection (DcMotorSimple.Direction.REVERSE);
-        Shooter1   .setDirection (DcMotorSimple.Direction.FORWARD);
-        Shooter2   .setDirection (DcMotorSimple.Direction.FORWARD); */
-
 
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
         robot.logger.logInfo("runOpMode", "===== [ Start Initializing ]");
@@ -81,7 +71,7 @@ public class BONAPARTE extends LinearOpMode {
             //sketchy intake code idk if work
             if (gamepad1.right_trigger > .1)
             {
-                robot.loader.indexer.setPosition(.65);
+                robot.loader.indexer.setPosition(.71);
                 robot.intake.setIntakePower(1);
             }
             else if (gamepad1.left_trigger  > .1)
