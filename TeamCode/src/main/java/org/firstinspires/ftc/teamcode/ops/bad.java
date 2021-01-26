@@ -179,7 +179,7 @@ public class bad extends LinearOpMode {
             //turn towards zone a
 
             Trajectory move2 = drive.trajectoryBuilder(move1.end())
-                    .splineTo(new Vector2d(2, -54), -30)
+                    .splineToLinearHeading(new Pose2d(-1, -52, 5), 0)
                     .build();
 
             drive.followTrajectory(move2);
