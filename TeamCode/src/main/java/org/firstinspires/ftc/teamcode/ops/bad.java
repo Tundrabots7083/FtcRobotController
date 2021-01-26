@@ -44,6 +44,10 @@ public class bad extends LinearOpMode {
     public Servo wobbleArm;
     public Servo wobbleClaw;
 
+
+
+    private long LOADER_TIME = 300;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -58,7 +62,7 @@ public class bad extends LinearOpMode {
         wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-
+/*
         //Dont look unless broken
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -78,10 +82,11 @@ public class bad extends LinearOpMode {
                 webcam.startStreaming(320,240, OpenCvCameraRotation.UPRIGHT);
             }
         });
-
+*/
         waitForStart();
         robot.shooter.init();
         robot.loader.init();
+
 
 // uncomment while loop to tweak camera comment for robot to sense then do drive paths
       /*  while (opModeIsActive()){
@@ -95,7 +100,7 @@ public class bad extends LinearOpMode {
 
 
 //------------------------------Drive-Paths-Below-------------------------------------------------\\
-
+/*
         if (pipeline.getAnalysis()>pipeline.FOUR_RING_THRESHOLD)
         {
 
@@ -103,16 +108,17 @@ public class bad extends LinearOpMode {
         else if (pipeline.getAnalysis()>pipeline.ONE_RING_THRESHOLD)
         {
 
+
         }
-        else
-        {
+        else*/
+        if(true){
 
              //set starting position
             drive.setPoseEstimate(new Pose2d(-63, -42, 0));
 
             //move to the launch line
             Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
-                    .splineTo(new Vector2d(0, -42), 0)
+                    .splineTo(new Vector2d(-10, -42), 0)
                     .build();
 
             drive.followTrajectory(move1);
@@ -121,42 +127,60 @@ public class bad extends LinearOpMode {
             robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
 
             //angle shooter
-            robot.shooter.ShootAngle.setPosition(1);
+            robot.shooter.ShootAngle.setPosition(.75);
 
             //angle indexer
             robot.loader.indexer.setPosition(1);
+
+            sleep(LOADER_TIME);
 
             //load three rings
 
             //in
             robot.loader.loaderServo.setPosition(.83);
 
-            //out
-            robot.loader.loaderServo.setPosition(.5);
-
-            //in
-            robot.loader.loaderServo.setPosition(.83);
-
-            sleep(1000);
+            sleep(LOADER_TIME);
 
             //out
             robot.loader.loaderServo.setPosition(.5);
 
+            sleep(LOADER_TIME);
+
             //in
             robot.loader.loaderServo.setPosition(.83);
 
-            sleep(1000);
+            sleep(LOADER_TIME);
 
             //out
             robot.loader.loaderServo.setPosition(.5);
 
+            sleep(LOADER_TIME);
+
             //in
             robot.loader.loaderServo.setPosition(.83);
 
-            sleep(1000);
+            sleep(LOADER_TIME);
+
+            //out
+            robot.loader.loaderServo.setPosition(.5);
+
+            //pause
+            sleep(LOADER_TIME);
+
+            //in
+            robot.loader.loaderServo.setPosition(.83);
+
+            //pause
+            sleep(LOADER_TIME);
 
             //turn off flywheel
             robot.shooter.setShooterVelocity(0);
+
+            //turn towards zone a
+
+            drive.turn(Math.toRadians(-30));
+
+            /*
 
             //drive to zone a
              Trajectory move2 = drive.trajectoryBuilder(move1.end())
@@ -164,6 +188,8 @@ public class bad extends LinearOpMode {
                     .build();
 
             drive.followTrajectory(move2);
+
+
 
             drive.turn(Math.toRadians(-30));
 
@@ -173,7 +199,7 @@ public class bad extends LinearOpMode {
             wobbleClaw.setPosition(.45);
 
             //backwards spline to pick up wobble two
-            Trajectory move3 = drive.trajectoryBuilder(move2.end())
+            Trajectory move3 = drive.trajectoryBuilder(move1.end())
                     .splineTo(new Vector2d(-40, -30), 180 )
                     .build();
 
@@ -209,6 +235,9 @@ public class bad extends LinearOpMode {
                     .build();
 
             drive.followTrajectory(move5);
+
+            */
+
         }
 
     }
