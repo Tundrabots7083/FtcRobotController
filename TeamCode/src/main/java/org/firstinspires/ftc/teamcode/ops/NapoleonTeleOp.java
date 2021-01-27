@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.ops;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -8,7 +9,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.components.DriveTrain;
 
-
+@Disabled
 @TeleOp(name="NapoleonTeleOp", group="ops")
 public class NapoleonTeleOp extends LinearOpMode {
     // Declare OpMode members.
