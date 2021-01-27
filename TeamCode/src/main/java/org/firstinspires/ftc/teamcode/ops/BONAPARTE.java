@@ -27,7 +27,7 @@ public class BONAPARTE extends LinearOpMode {
     private boolean logEnableTrace = false;
     private boolean logToTelemetry = true;
 
-    private double SHOOTER_RPM = 9600;
+    private double SHOOTER_RPM = 8000;
     private double TICKS_PER_ROTATION = 14;
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
 
@@ -107,7 +107,7 @@ public class BONAPARTE extends LinearOpMode {
             if      (gamepad1.dpad_down)
             {
                 //change values
-                robot.shooter.ShootAngle.setPosition(.75);
+                robot.shooter.ShootAngle.setPosition(.85);
             }
             else if (gamepad1.dpad_up)
             {
@@ -148,7 +148,7 @@ public class BONAPARTE extends LinearOpMode {
 
         xSpeed = Range.clip(xSpeed, -1, 1);
         ySpeed = Range.clip(ySpeed, -1, 1 );
-        turnSpeed = Range.clip(turnSpeed, -1, 1 );
+        turnSpeed = Range.clip(turnSpeed, -.5, .5 );
 
         org.firstinspires.ftc.teamcode.geometry.Vector2d input = new org.firstinspires.ftc.teamcode.geometry.Vector2d(xSpeed,ySpeed);
 
