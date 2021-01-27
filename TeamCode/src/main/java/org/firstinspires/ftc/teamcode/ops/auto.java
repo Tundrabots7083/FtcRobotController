@@ -130,25 +130,25 @@ public class auto extends LinearOpMode {
                         robot.loader.indexer.setPosition(1);
                         robot.shooter.setShooterPower(.6);
                     })
-                    .addTemporalMarker(1.4, () -> {
+                    .addTemporalMarker(1.25, () -> {
                         robot.loader.loaderServo.setPosition(.5);
                     })
-                    .addTemporalMarker(1.8, () -> {
+                    .addTemporalMarker(1.35, () -> {
                         robot.loader.loaderServo.setPosition(.83);
                     })
-                    .addTemporalMarker(2.2, () -> {
+                    .addTemporalMarker(1.5, () -> {
                         robot.loader.loaderServo.setPosition(.5);
                     })
-                    .addTemporalMarker(2.6, () -> {
+                    .addTemporalMarker(1.6, () -> {
                         robot.loader.loaderServo.setPosition(.83);
                     })
-                    .addTemporalMarker(3, () -> {
+                    .addTemporalMarker(1.75, () -> {
                         robot.loader.loaderServo.setPosition(.5);
                     })
-                    .addTemporalMarker(3.4, () -> {
+                    .addTemporalMarker(1.85, () -> {
                         robot.loader.loaderServo.setPosition(.83);
                     })
-                    .addTemporalMarker(3.8, () -> {
+                    .addTemporalMarker(2, () -> {
                         robot.shooter.setShooterPower(0);
                     })
                     .build();
