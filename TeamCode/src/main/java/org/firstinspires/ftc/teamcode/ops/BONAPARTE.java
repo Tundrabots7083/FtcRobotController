@@ -142,7 +142,7 @@ public class BONAPARTE extends LinearOpMode {
      **/
 
     public void FieldRelative(double ySpeed, double xSpeed, double turnSpeed) {
-        double angle = robot.gyroNavigator.getAngleGood();
+        double angle = (robot.gyroNavigator.getAngleGood()) + (-90);
         angle  = AngleWrapDeg(angle);
         angle = -angle;
 

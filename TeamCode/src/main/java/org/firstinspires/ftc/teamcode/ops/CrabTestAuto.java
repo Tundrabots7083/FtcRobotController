@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.ops;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -8,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.components.DriveTrain;
 
-
+@Disabled
 @Autonomous(name="CrabTestAuto", group="ops")
 public class CrabTestAuto extends LinearOpMode {
     // Declare OpMode members.
