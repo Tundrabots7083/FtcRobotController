@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.ops;
 
 import android.graphics.PostProcessor;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -10,7 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -24,7 +22,6 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
-
 
 @Autonomous(name="bad", group="ops")
 public class bad extends LinearOpMode {
@@ -73,54 +70,57 @@ public class bad extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         //Dont look unless broken
-        /*int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         pipeline = new SkystoneDeterminationPipeline();
-        webcam.setPipeline(pipeline);*/
+        webcam.setPipeline(pipeline);
 
         // We set the viewport policy to optimized view so the preview doesn't appear 90 deg
         // out when the RC activity is in portrait. We do our actual image processing assuming
         // landscape orientation, though.
-        //      webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
+        webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
-        // webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-       /* {
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
-            public void onOpened()
-            {
-                webcam.startStreaming(320,240, OpenCvCameraRotation.UPRIGHT);
+            public void onOpened() {
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
             }
-        }); */
+        });
 
         waitForStart();
         robot.shooter.init();
         robot.loader.init();
 
 
-// uncomment while loop to tweak camera comment for robot to sense then do drive paths
-           /* while (opModeIsActive()){
+        // uncomment while loop to tweak camera comment for robot to sense then do drive paths
+         /*   while (opModeIsActive())
+            {
             telemetry.addData("Analysis", pipeline.getAnalysis());
             telemetry.addData("Position",pipeline.position);
             telemetry.update();
             sleep(50);
-        }
+            }
         //sleeps for camera to have time to sense tweak to whatever is good
         sleep(1000);
-*/
+            */
 
 //------------------------------Drive-Paths-Below-------------------------------------------------\\
-/*
-      if (pipeline.getAnalysis()>pipeline.FOUR_RING_THRESHOLD) {
+        telemetry.addData("Analysis", pipeline.getAnalysis());
+        telemetry.addData("position", pipeline.position);
+        telemetry.update();
+        sleep(1000);
+        if (pipeline.getAnalysis() > pipeline.FOUR_RING_THRESHOLD) {
 
-          //4 ring
-          //set starting position
-          drive.setPoseEstimate(new Pose2d(-63, -42, 0));
-          wobbleArm.setPosition(.2);
+            webcam.stopStreaming();
+            //4 ring
+            //set starting position
+            drive.setPoseEstimate(new Pose2d(-63, -43, 0));
+            wobbleArm.setPosition(.2);
 
-          //move to behind the stack to shoot
-          Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
-                  .splineTo(new Vector2d(-38, -38), 0)
-                  .build();
+            //move to behind the stack to shoot
+            Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
+                    .splineTo(new Vector2d(-38, -38), 0)
+                    .build();
 
           drive.followTrajectory(move1);
 
@@ -252,29 +252,27 @@ public class bad extends LinearOpMode {
           wobbleArm.setPosition(.2);
           sleep(100);
           wobbleClaw.setPosition(.2);
-          sleep(100);
-          wobbleArm.setPosition(0);
-          sleep(100);
+            sleep(100);
+            wobbleArm.setPosition(0);
+            sleep(100);
 
-          //park on da line
-          Trajectory move8 = drive.trajectoryBuilder(move7.end())
-                  .splineTo(new Vector2d(10, -30), 0)
-                  .build();
+            //park on da line
+            Trajectory move8 = drive.trajectoryBuilder(move7.end())
+                    .splineTo(new Vector2d(10, -30), 0)
+                    .build();
 
-          drive.followTrajectory(move8);
+            drive.followTrajectory(move8);
+        } else if (pipeline.getAnalysis() > pipeline.ONE_RING_THRESHOLD) {
 
+            webcam.stopStreaming();
+            //1 ring
+            //set starting position
+            drive.setPoseEstimate(new Pose2d(-63, -43, 0));
 
-
-        } else if (pipeline.getAnalysis()>pipeline.ONE_RING_THRESHOLD) {
-
-          //1 ring
-          //set starting position
-          drive.setPoseEstimate(new Pose2d(-63, -42, 0));
-
-          //move to behind the stack to shoot
-          Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
-                  .splineTo(new Vector2d(-38, -42), 0)
-                  .build();
+            //move to behind the stack to shoot
+            Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
+                    .splineTo(new Vector2d(-38, -42), 0)
+                    .build();
 
           drive.followTrajectory(move1);
 
@@ -369,25 +367,25 @@ public class bad extends LinearOpMode {
           wobbleArm.setPosition(0);
           sleep(500);
 
-          //park on the launch line
-          Trajectory move6 = drive.trajectoryBuilder(move5.end())
-                  .splineToLinearHeading(new Pose2d(10, -30, Math.toRadians(0)), 0)
-                  .build();
+            //park on the launch line
+            Trajectory move6 = drive.trajectoryBuilder(move5.end())
+                    .splineToLinearHeading(new Pose2d(10, -30, Math.toRadians(0)), 0)
+                    .build();
 
-          drive.followTrajectory(move6);
+            drive.followTrajectory(move6);
 
 
+        } else {
 
-      } else {
+            webcam.stopStreaming();
+            //0 ring
+            //set starting position
+            drive.setPoseEstimate(new Pose2d(-63, -43, 0));
 
-          //0 ring
-          //set starting position
-          drive.setPoseEstimate(new Pose2d(-63, -42, 0));
-
-          //move to the launch line
-          Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
-                  .splineTo(new Vector2d(0, -42), 0)
-                  .build();
+            //move to the launch line
+            Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
+                    .splineTo(new Vector2d(0, -42), 0)
+                    .build();
 
           drive.followTrajectory(move1);
 
@@ -470,100 +468,6 @@ public class bad extends LinearOpMode {
           drive.followTrajectory(move5);
 
 
-
-      }*/
-
-        if (true) {
-            //0 ring
-            //set starting position
-            drive.setPoseEstimate(new Pose2d(-63, -42, 0));
-
-            //move to the launch line
-            Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
-                    .splineTo(new Vector2d(0, -42), 0)
-                    .build();
-
-            drive.followTrajectory(move1);
-
-            //shoot three rings
-            robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-            robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
-            robot.loader.indexer.setPosition(1);
-            sleep(LOADER_TIME);
-            robot.loader.loaderServo.setPosition(.83);
-            sleep(LOADER_TIME);
-            robot.loader.loaderServo.setPosition(.5);
-            sleep(LOADER_TIME);
-            robot.loader.loaderServo.setPosition(.83);
-            sleep(LOADER_TIME);
-            robot.loader.loaderServo.setPosition(.5);
-            sleep(LOADER_TIME);
-            robot.loader.loaderServo.setPosition(.83);
-            sleep(LOADER_TIME);
-            robot.loader.loaderServo.setPosition(.5);
-            sleep(LOADER_TIME);
-            robot.loader.loaderServo.setPosition(.83);
-            sleep(LOADER_TIME);
-            robot.shooter.setShooterVelocity(0);
-
-            //turn towards zone a
-            Trajectory move2 = drive.trajectoryBuilder(move1.end())
-                    .splineToLinearHeading(new Pose2d(-1, -52, Math.toRadians(-25)), 0)
-                    .build();
-
-            drive.followTrajectory(move2);
-
-            //drop wobble one
-            wobbleArm.setPosition(.4);
-            sleep(1000);
-            wobbleClaw.setPosition(.35);
-            sleep(200);
-            wobbleArm.setPosition(.2);
-
-
-            //drive to pick up second wobble
-            Trajectory move3 = drive.trajectoryBuilder(move2.end())
-                    .splineToLinearHeading(new Pose2d(-30, -32, Math.toRadians(180)), 0)
-                    .build();
-
-            drive.followTrajectory(move3);
-
-            //pick up second wobble
-            sleep(200);
-            wobbleArm.setPosition(.5);
-            sleep(500);
-            wobbleClaw.setPosition(.15);
-            sleep(500);
-            wobbleArm.setPosition(.3);
-
-            //drive to zone a to drop second wobble
-            Trajectory move4 = drive.trajectoryBuilder(move3.end())
-                    .splineToLinearHeading(new Pose2d(-7, -45, Math.toRadians(-15)), 0)
-                    .build();
-
-            drive.followTrajectory(move4);
-
-            //drop second wobble
-            sleep(200);
-            wobbleArm.setPosition(.4);
-            sleep(500);
-            wobbleClaw.setPosition(.45);
-            sleep(100);
-            wobbleArm.setPosition(.2);
-            sleep(100);
-            wobbleClaw.setPosition(.2);
-            sleep(100);
-            wobbleArm.setPosition(0);
-            sleep(100);
-
-            //park on the launch line
-            Trajectory move5 = drive.trajectoryBuilder(move4.end())
-                    .splineToLinearHeading(new Pose2d(10, -30, Math.toRadians(0)), 0)
-                    .build();
-
-            drive.followTrajectory(move5);
-
-
         }
 
     }
@@ -589,20 +493,20 @@ public class bad extends LinearOpMode {
          * The core values which define the location and size of the sample regions
          */
         //location
-        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(93,92);
+        static final Point REGION1_TOP_LEFT_ANCHOR_POINT = new Point(150, 155);
         //Size
-        static final int REGION_WIDTH  = 35;
-        static final int REGION_HEIGHT = 25;
+        static final int REGION_WIDTH = 45;
+        static final int REGION_HEIGHT = 30;
         //Threshholds
         final int FOUR_RING_THRESHOLD = 160;
-        final int ONE_RING_THRESHOLD  = 135;
+        final int ONE_RING_THRESHOLD = 140;
 
         Point region1_pointA = new Point(
-                REGION1_TOPLEFT_ANCHOR_POINT.x,
-                REGION1_TOPLEFT_ANCHOR_POINT.y);
+                REGION1_TOP_LEFT_ANCHOR_POINT.x,
+                REGION1_TOP_LEFT_ANCHOR_POINT.y);
         Point region1_pointB = new Point(
-                REGION1_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
-                REGION1_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
+                REGION1_TOP_LEFT_ANCHOR_POINT.x + REGION_WIDTH,
+                REGION1_TOP_LEFT_ANCHOR_POINT.y + REGION_HEIGHT);
 
         /*
          * Working variables
@@ -644,7 +548,7 @@ public class bad extends LinearOpMode {
                     input, // Buffer to draw on
                     region1_pointA, // First point which defines the rectangle
                     region1_pointB, // Second point which defines the rectangle
-                    BLUE, // The color the rectangle is drawn in
+                    GREEN, // The color the rectangle is drawn in
                     2); // Thickness of the rectangle lines
 
             position = RingPosition.FOUR; // Record our analysis
@@ -662,7 +566,7 @@ public class bad extends LinearOpMode {
                     region1_pointA, // First point which defines the rectangle
                     region1_pointB, // Second point which defines the rectangle
                     GREEN, // The color the rectangle is drawn in
-                    -1); // Negative thickness means solid fill
+                    1); // Negative thickness means solid fill
 
             return input;
         }
