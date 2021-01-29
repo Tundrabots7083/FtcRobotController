@@ -37,7 +37,7 @@ public class bad extends LinearOpMode {
     OpenCvCamera webcam;
     SkystoneDeterminationPipeline pipeline;
     //shooter stuff
-    private double SHOOTER_RPM = 9600;
+    private double SHOOTER_RPM = 7000;
     private double TICKS_PER_ROTATION = 14;
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
     //intake
@@ -49,6 +49,9 @@ public class bad extends LinearOpMode {
 
 
     private long LOADER_TIME = 300;
+
+    private double AT_LINE_ANGLE = 0.87;
+    private double BEHIND_STACK_ANGLE = 1;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -70,24 +73,24 @@ public class bad extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         //Dont look unless broken
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        /*int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         pipeline = new SkystoneDeterminationPipeline();
-        webcam.setPipeline(pipeline);
+        webcam.setPipeline(pipeline);*/
 
         // We set the viewport policy to optimized view so the preview doesn't appear 90 deg
         // out when the RC activity is in portrait. We do our actual image processing assuming
         // landscape orientation, though.
         //      webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
+        // webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+       /* {
             @Override
             public void onOpened()
             {
                 webcam.startStreaming(320,240, OpenCvCameraRotation.UPRIGHT);
             }
-        });
+        }); */
 
         waitForStart();
         robot.shooter.init();
@@ -95,7 +98,7 @@ public class bad extends LinearOpMode {
 
 
 // uncomment while loop to tweak camera comment for robot to sense then do drive paths
-            while (opModeIsActive()){
+           /* while (opModeIsActive()){
             telemetry.addData("Analysis", pipeline.getAnalysis());
             telemetry.addData("Position",pipeline.position);
             telemetry.update();
@@ -103,10 +106,10 @@ public class bad extends LinearOpMode {
         }
         //sleeps for camera to have time to sense tweak to whatever is good
         sleep(1000);
-
+*/
 
 //------------------------------Drive-Paths-Below-------------------------------------------------\\
-
+/*
       if (pipeline.getAnalysis()>pipeline.FOUR_RING_THRESHOLD) {
 
           //4 ring
@@ -123,7 +126,7 @@ public class bad extends LinearOpMode {
 
           //shoot three rings
           robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.shooter.ShootAngle.setPosition(.75);
+          robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
           robot.loader.indexer.setPosition(1);
           sleep(LOADER_TIME);
           robot.loader.loaderServo.setPosition(.83);
@@ -155,7 +158,7 @@ public class bad extends LinearOpMode {
 
           //shoot three rings
           robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.shooter.ShootAngle.setPosition(.75);
+          robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
           robot.loader.indexer.setPosition(1);
           sleep(LOADER_TIME);
           robot.loader.loaderServo.setPosition(.83);
@@ -184,7 +187,7 @@ public class bad extends LinearOpMode {
 
           //shoot three rings
           robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.shooter.ShootAngle.setPosition(.75);
+          robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
           robot.loader.indexer.setPosition(1);
           sleep(LOADER_TIME);
           robot.loader.loaderServo.setPosition(.83);
@@ -276,7 +279,7 @@ public class bad extends LinearOpMode {
           drive.followTrajectory(move1);
 
           robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.shooter.ShootAngle.setPosition(.75);
+          robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
           robot.loader.indexer.setPosition(1);
           sleep(LOADER_TIME);
           robot.loader.loaderServo.setPosition(.83);
@@ -390,7 +393,7 @@ public class bad extends LinearOpMode {
 
           //shoot three rings
           robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.shooter.ShootAngle.setPosition(.75);
+          robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
           robot.loader.indexer.setPosition(1);
           sleep(LOADER_TIME);
           robot.loader.loaderServo.setPosition(.83);
@@ -468,7 +471,100 @@ public class bad extends LinearOpMode {
 
 
 
-      }
+      }*/
+
+        if (true) {
+            //0 ring
+            //set starting position
+            drive.setPoseEstimate(new Pose2d(-63, -42, 0));
+
+            //move to the launch line
+            Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -42, 0))
+                    .splineTo(new Vector2d(0, -42), 0)
+                    .build();
+
+            drive.followTrajectory(move1);
+
+            //shoot three rings
+            robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
+            robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
+            robot.loader.indexer.setPosition(1);
+            sleep(LOADER_TIME);
+            robot.loader.loaderServo.setPosition(.83);
+            sleep(LOADER_TIME);
+            robot.loader.loaderServo.setPosition(.5);
+            sleep(LOADER_TIME);
+            robot.loader.loaderServo.setPosition(.83);
+            sleep(LOADER_TIME);
+            robot.loader.loaderServo.setPosition(.5);
+            sleep(LOADER_TIME);
+            robot.loader.loaderServo.setPosition(.83);
+            sleep(LOADER_TIME);
+            robot.loader.loaderServo.setPosition(.5);
+            sleep(LOADER_TIME);
+            robot.loader.loaderServo.setPosition(.83);
+            sleep(LOADER_TIME);
+            robot.shooter.setShooterVelocity(0);
+
+            //turn towards zone a
+            Trajectory move2 = drive.trajectoryBuilder(move1.end())
+                    .splineToLinearHeading(new Pose2d(-1, -52, Math.toRadians(-25)), 0)
+                    .build();
+
+            drive.followTrajectory(move2);
+
+            //drop wobble one
+            wobbleArm.setPosition(.4);
+            sleep(1000);
+            wobbleClaw.setPosition(.35);
+            sleep(200);
+            wobbleArm.setPosition(.2);
+
+
+            //drive to pick up second wobble
+            Trajectory move3 = drive.trajectoryBuilder(move2.end())
+                    .splineToLinearHeading(new Pose2d(-30, -32, Math.toRadians(180)), 0)
+                    .build();
+
+            drive.followTrajectory(move3);
+
+            //pick up second wobble
+            sleep(200);
+            wobbleArm.setPosition(.5);
+            sleep(500);
+            wobbleClaw.setPosition(.15);
+            sleep(500);
+            wobbleArm.setPosition(.3);
+
+            //drive to zone a to drop second wobble
+            Trajectory move4 = drive.trajectoryBuilder(move3.end())
+                    .splineToLinearHeading(new Pose2d(-7, -45, Math.toRadians(-15)), 0)
+                    .build();
+
+            drive.followTrajectory(move4);
+
+            //drop second wobble
+            sleep(200);
+            wobbleArm.setPosition(.4);
+            sleep(500);
+            wobbleClaw.setPosition(.45);
+            sleep(100);
+            wobbleArm.setPosition(.2);
+            sleep(100);
+            wobbleClaw.setPosition(.2);
+            sleep(100);
+            wobbleArm.setPosition(0);
+            sleep(100);
+
+            //park on the launch line
+            Trajectory move5 = drive.trajectoryBuilder(move4.end())
+                    .splineToLinearHeading(new Pose2d(10, -30, Math.toRadians(0)), 0)
+                    .build();
+
+            drive.followTrajectory(move5);
+
+
+        }
 
     }
 //------------------------------Methods-Below-Here------------------------------------------------\\

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.IncludedFirmwareFileInfo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.bots.TestBot;
@@ -27,7 +28,7 @@ public class BONAPARTE extends LinearOpMode {
     private boolean logEnableTrace = false;
     private boolean logToTelemetry = true;
 
-    private double SHOOTER_RPM = 8000;
+    private double SHOOTER_RPM = 7000;
     private double TICKS_PER_ROTATION = 14;
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
 
@@ -61,7 +62,7 @@ public class BONAPARTE extends LinearOpMode {
         robot.logger.logInfo("runOpMode", "===== [ Start TeleOp ]");
         runtime.reset();
 
-
+        wobbleArm.setPosition(.1);
 
         while (opModeIsActive()) {
 
@@ -107,7 +108,7 @@ public class BONAPARTE extends LinearOpMode {
             if      (gamepad1.dpad_down)
             {
                 //change values
-                robot.shooter.ShootAngle.setPosition(.85);
+                robot.shooter.ShootAngle.setPosition(.86);
             }
             else if (gamepad1.dpad_up)
             {
@@ -143,14 +144,15 @@ public class BONAPARTE extends LinearOpMode {
 
     public void FieldRelative(double ySpeed, double xSpeed, double turnSpeed) {
         double angle = (robot.gyroNavigator.getAngleGood()) + (-90);
-        angle  = AngleWrapDeg(angle);
+        angle = AngleWrapDeg(angle);
         angle = -angle;
 
         xSpeed = Range.clip(xSpeed, -1, 1);
-        ySpeed = Range.clip(ySpeed, -1, 1 );
-        turnSpeed = Range.clip(turnSpeed, -.5, .5 );
+        ySpeed = Range.clip(ySpeed, -1, 1);
+        turnSpeed = Range.clip(turnSpeed, -1, 1);
 
-        org.firstinspires.ftc.teamcode.geometry.Vector2d input = new org.firstinspires.ftc.teamcode.geometry.Vector2d(xSpeed,ySpeed);
+
+        org.firstinspires.ftc.teamcode.geometry.Vector2d input = new org.firstinspires.ftc.teamcode.geometry.Vector2d(xSpeed, ySpeed);
 
         input = input.rotateBy(angle);
 
@@ -177,7 +179,6 @@ public class BONAPARTE extends LinearOpMode {
             frontLeftPower = (frontLeftPower / maxMagnitude) * input.magnitude();
             backRightPower = (backRightPower / maxMagnitude) * input.magnitude();
             backLeftPower = (backLeftPower / maxMagnitude) * input.magnitude();
-
         } else {
             double maxMagnitude = Math.abs(frontLeftPower);
             if (Math.abs(frontRightPower) > maxMagnitude) {
@@ -196,15 +197,23 @@ public class BONAPARTE extends LinearOpMode {
             backLeftPower = (backLeftPower / maxMagnitude);
         }
 
+        double speed = 1;
 
-        robot.driveTrain.backLeftMotor.setPower(backLeftPower);
-        robot.driveTrain.backRightMotor.setPower(backRightPower);
-        robot.driveTrain.frontLeftMotor.setPower(frontLeftPower);
-        robot.driveTrain.frontRightMotor.setPower(frontRightPower);
+        if (gamepad1.left_bumper) {
+            speed = .4;
 
+        } else {
+
+            speed = 1;
+
+        }
+
+        robot.driveTrain.backLeftMotor.setPower(backLeftPower * speed);
+        robot.driveTrain.backRightMotor.setPower(backRightPower * speed);
+        robot.driveTrain.frontLeftMotor.setPower(frontLeftPower * speed);
+        robot.driveTrain.frontRightMotor.setPower(frontRightPower * speed);
 
     }
-
     public double AngleWrapDeg(double degrees) {
         while (degrees < -180 ) {
             degrees += 2.0 * 180;
