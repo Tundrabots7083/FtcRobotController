@@ -41,6 +41,7 @@ public class bad extends LinearOpMode {
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
     //motors
     public DcMotor intake = null;
+
     //servos
     public Servo wobbleArm;
     public Servo wobbleClaw;
@@ -48,9 +49,9 @@ public class bad extends LinearOpMode {
     private long LOADER_TIME = 300;
     private double INDEXER_UP = 1;
     private double INDEXER_DOWN = 0.65;
-    private double ANGLE_A = 0.71;
-    private double ANGLE_B = 0.74;
-    private double ANGLE_C = 0.76;
+    private double ANGLE_A = 0.85; // at shooting line
+    private double ANGLE_B = 0.85; //halfway
+    private double ANGLE_C = 0.84; //behind the stack
 
 
     @Override
@@ -59,6 +60,7 @@ public class bad extends LinearOpMode {
         wobbleClaw = hardwareMap.get(Servo.class, "wobbleClaw");
         wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
         intake = hardwareMap.get(DcMotor.class, "rightIntake");
+
 
 
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
@@ -139,6 +141,8 @@ public class bad extends LinearOpMode {
 
             drive.followTrajectory(move2);
 
+            sleep(1500);
+
             //shoot three rings
             Shoot(3, ANGLE_B);
 
@@ -148,6 +152,8 @@ public class bad extends LinearOpMode {
                     .build();
 
             drive.followTrajectory(move4);
+
+            sleep(3000);
 
             //shoot three rings
             Shoot(3, ANGLE_A);
@@ -177,7 +183,7 @@ public class bad extends LinearOpMode {
 
             //drop off wobble 2
             Trajectory move7 = drive.trajectoryBuilder(move6.end())
-                    .lineToLinearHeading(new Pose2d(40, -41, Math.toRadians(-15)))
+                    .lineToLinearHeading(new Pose2d(40, -41, Math.toRadians(-17)))
                     .build();
 
             drive.followTrajectory(move7);
@@ -185,12 +191,22 @@ public class bad extends LinearOpMode {
             //yeet wobble two
             ReleaseWobble();
 
+            Trajectory move69 = drive.trajectoryBuilder(move7.end())
+                    .lineToSplineHeading(new Pose2d(10, -30, 0))
+                    .build();
+
+            drive.followTrajectory(move69);
+
+
+
+            /*
             //park on da line
             Trajectory move8 = drive.trajectoryBuilder(move7.end())
                     .splineToLinearHeading(new Pose2d(10, -30, 0), 0)
                     .build();
 
             drive.followTrajectory(move8);
+             */
 
         } else if (pipeline.getAnalysis() > pipeline.ONE_RING_THRESHOLD) {
             //1 ring
@@ -337,7 +353,37 @@ public class bad extends LinearOpMode {
      */
     public void Shoot(double Shots, double ShooterAngle) {
         //flywheel on
-        //robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
+        robot.shooter.setShooterPower(.75);
+        //shooter angle
+        robot.shooter.ShootAngle.setPosition(ShooterAngle);
+        //indexer up
+        robot.loader.indexer.setPosition(INDEXER_UP);
+        //wait for shooter to get to speed
+        sleep(500);
+        //load rings
+        for (double i = 0; i < Shots; i++) {
+            robot.loader.loaderServo.setPosition(.83);
+            sleep(LOADER_TIME);
+            robot.loader.loaderServo.setPosition(.5);
+            sleep(LOADER_TIME);
+        }
+        //loader arm in position
+        robot.loader.loaderServo.setPosition(.83);
+        //flywheel off
+        robot.shooter.setShooterPower(0);
+        //indexer down
+        robot.loader.indexer.setPosition(INDEXER_DOWN);
+    }
+
+    /**
+     * shooting method that doesn't work yet
+     *
+     * @param Shots
+     * @param ShooterAngle
+     */
+    public void bad(double Shots, double ShooterAngle) {
+        //flywheel on
+        robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
         //shooter angle
         robot.shooter.ShootAngle.setPosition(ShooterAngle);
         //indexer up
@@ -362,6 +408,7 @@ public class bad extends LinearOpMode {
         //indexer down
         robot.loader.indexer.setPosition(INDEXER_DOWN);
     }
+
 
     /**
      * ReleaseWobble

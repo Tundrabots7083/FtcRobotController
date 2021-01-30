@@ -62,7 +62,8 @@ public class BONAPARTE extends LinearOpMode {
         robot.logger.logInfo("runOpMode", "===== [ Start TeleOp ]");
         runtime.reset();
 
-        wobbleArm.setPosition(.1);
+        wobbleArm.setPosition(.2);
+        robot.shooter.ShootAngle.setPosition(.85);
 
         while (opModeIsActive()) {
 
@@ -70,8 +71,7 @@ public class BONAPARTE extends LinearOpMode {
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
             //sketchy intake code idk if work
-            if (gamepad1.right_trigger > .1)
-            {
+            if (gamepad1.right_trigger > .1) {
                 robot.loader.indexer.setPosition(.71);
                 robot.intake.setIntakePower(1);
             }
@@ -86,12 +86,12 @@ public class BONAPARTE extends LinearOpMode {
 
             if (gamepad1.left_bumper)
             {
-                robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
+                robot.shooter.setShooterPower(.75);
                 robot.loader.indexer.setPosition(1);
             }
             else
             {
-                robot.shooter.setShooterVelocity(0);
+                robot.shooter.setShooterPower(0);
             }
 
             if (gamepad1.right_bumper)
@@ -108,12 +108,12 @@ public class BONAPARTE extends LinearOpMode {
             if      (gamepad1.dpad_down)
             {
                 //change values
-                robot.shooter.ShootAngle.setPosition(.86);
+                robot.shooter.ShootAngle.setPosition(.85);
             }
             else if (gamepad1.dpad_up)
             {
                 //change values
-                robot.shooter.ShootAngle.setPosition(1);
+                robot.shooter.ShootAngle.setPosition(.83);
             }
 
             if     (gamepad1.y)
