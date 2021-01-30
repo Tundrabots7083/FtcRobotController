@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.ops;
 
 import android.graphics.PostProcessor;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -23,46 +25,46 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-@Autonomous(name="bad", group="ops")
+@Autonomous(name = "bad", group = "ops")
 public class bad extends LinearOpMode {
-    // Declare OpMode members.
+    //Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private TestBot robot = null;
     private boolean logEnableTrace = false;
     private boolean logToTelemetry = true;
-    // OpenCV declaration
+    //OpenCV declaration
     OpenCvCamera webcam;
     SkystoneDeterminationPipeline pipeline;
-    //shooter stuff
+    //shooter
     private double SHOOTER_RPM = 7000;
     private double TICKS_PER_ROTATION = 14;
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
-    //intake
-    public DcMotor Intake = null;
+    //motors
+    public DcMotor intake = null;
     //servos
     public Servo wobbleArm;
     public Servo wobbleClaw;
-    public DcMotor intake;
-
-
+    //variables
     private long LOADER_TIME = 300;
+    private double INDEXER_UP = 1;
+    private double INDEXER_DOWN = 0.65;
+    private double ANGLE_A = 0.71;
+    private double ANGLE_B = 0.74;
+    private double ANGLE_C = 0.76;
 
-    private double AT_LINE_ANGLE = 0.87;
-    private double BEHIND_STACK_ANGLE = 1;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Intake = hardwareMap.dcMotor.get("rightIntake");
+        wobbleClaw = hardwareMap.get(Servo.class, "wobbleClaw");
+        wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
+        intake = hardwareMap.get(DcMotor.class, "rightIntake");
+
 
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
 
         robot.shooter.init();
         robot.loader.init();
-
-        wobbleClaw = hardwareMap.get(Servo.class, "wobbleClaw");
-        wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
-        intake = hardwareMap.get(DcMotor.class, "rightIntake");
 
         wobbleClaw.setPosition(.15);
         wobbleArm.setPosition(0);
@@ -93,279 +95,174 @@ public class bad extends LinearOpMode {
 
 
         // uncomment while loop to tweak camera comment for robot to sense then do drive paths
-         /*   while (opModeIsActive())
+            /*while (opModeIsActive())
             {
             telemetry.addData("Analysis", pipeline.getAnalysis());
             telemetry.addData("Position",pipeline.position);
             telemetry.update();
             sleep(50);
-            }
+            }*/
         //sleeps for camera to have time to sense tweak to whatever is good
         sleep(1000);
-            */
+
 
 //------------------------------Drive-Paths-Below-------------------------------------------------\\
         telemetry.addData("Analysis", pipeline.getAnalysis());
-        telemetry.addData("position", pipeline.position);
+        telemetry.addData("Position", pipeline.position);
         telemetry.update();
-        sleep(1000);
-        if (pipeline.getAnalysis() > pipeline.FOUR_RING_THRESHOLD) {
+        wobbleArm.setPosition(.2);
 
-            webcam.stopStreaming();
+        if (pipeline.getAnalysis() > pipeline.FOUR_RING_THRESHOLD) {
             //4 ring
+            webcam.stopStreaming();
+
             //set starting position
             drive.setPoseEstimate(new Pose2d(-63, -43, 0));
-            wobbleArm.setPosition(.2);
 
             //move to behind the stack to shoot
             Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
-                    .splineTo(new Vector2d(-38, -38), 0)
+                    .lineToLinearHeading(new Pose2d(-38, -38, 0))
                     .build();
 
-          drive.followTrajectory(move1);
+            drive.followTrajectory(move1);
 
-          //shoot three rings
-          robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
-          robot.loader.indexer.setPosition(1);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.shooter.setShooterVelocity(0);
-          robot.loader.indexer.setPosition(.71);
-          intake.setPower(-1);
+            //shoot three rings
+            Shoot(3, ANGLE_C);
 
-          //drive over stack to be epic
-          Trajectory move2 = drive.trajectoryBuilder(move1.end())
-                  .splineTo(new Vector2d(-27, -38), 0)
-                  .build();
+            //intake on
+            intake.setPower(-1);
 
-          drive.followTrajectory(move2);
+            //drive over stack to be epic
+            Trajectory move2 = drive.trajectoryBuilder(move1.end())
+                    .splineTo(new Vector2d(-27, -38), 0)
+                    .build();
 
-          sleep(3000);
+            drive.followTrajectory(move2);
 
-          //shoot three rings
-          robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
-          robot.loader.indexer.setPosition(1);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.shooter.setShooterVelocity(0);
-          robot.loader.indexer.setPosition(.71);
+            //shoot three rings
+            Shoot(3, ANGLE_B);
 
-          //drive to line to shoot again
-          Trajectory move4 = drive.trajectoryBuilder(move2.end())
-                  .splineTo(new Vector2d(0, -38), 0)
-                  .build();
+            //drive to line to shoot again
+            Trajectory move4 = drive.trajectoryBuilder(move2.end())
+                    .splineTo(new Vector2d(-4, -38), 0)
+                    .build();
 
-          drive.followTrajectory(move4);
+            drive.followTrajectory(move4);
 
-          //shoot three rings
-          robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
-          robot.loader.indexer.setPosition(1);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.shooter.setShooterVelocity(0);
-          intake.setPower(0);
+            //shoot three rings
+            Shoot(3, ANGLE_A);
 
-          //drop off wobble 1
-          Trajectory move5 = drive.trajectoryBuilder(move4.end())
-                  .splineToLinearHeading(new Pose2d(49, -51, Math.toRadians(-25)), 0)
-                  .build();
+            //intake off
+            intake.setPower(0);
 
-          drive.followTrajectory(move5);
+            //drop off wobble 1
+            Trajectory move5 = drive.trajectoryBuilder(move4.end())
+                    .lineToLinearHeading(new Pose2d(49, -51, Math.toRadians(-25)))
+                    .build();
 
-          //drop wobble one
-          wobbleArm.setPosition(.4);
-          sleep(1000);
-          wobbleClaw.setPosition(.35);
-          sleep(200);
-          wobbleArm.setPosition(.2);
+            drive.followTrajectory(move5);
 
-          //go pickup wobble 2
-          Trajectory move6 = drive.trajectoryBuilder(move5.end())
-                  .splineToLinearHeading(new Pose2d(-30, -32, Math.toRadians(-180)), 0)
-                  .build();
+            //drop wobble one
+            ReleaseWobble();
 
-          drive.followTrajectory(move6);
+            //go pickup wobble 2
+            Trajectory move6 = drive.trajectoryBuilder(move5.end())
+                    .lineToLinearHeading(new Pose2d(-31, -29, Math.toRadians(180)))
+                    .build();
 
-          //pick up second wobble
-          sleep(200);
-          wobbleArm.setPosition(.5);
-          sleep(500);
-          wobbleClaw.setPosition(.15);
-          sleep(500);
-          wobbleArm.setPosition(.3);
+            drive.followTrajectory(move6);
 
-          //drop off wobble 2
-          Trajectory move7 = drive.trajectoryBuilder(move6.end())
-                  .splineToLinearHeading(new Pose2d(41, -45, Math.toRadians(-15)), 0)
-                  .build();
+            //pick up second wobble
+            PickupWobble();
 
-          drive.followTrajectory(move7);
+            //drop off wobble 2
+            Trajectory move7 = drive.trajectoryBuilder(move6.end())
+                    .lineToLinearHeading(new Pose2d(40, -41, Math.toRadians(-15)))
+                    .build();
 
-          //drop second wobble
-          sleep(200);
-          wobbleArm.setPosition(.4);
-          sleep(500);
-          wobbleClaw.setPosition(.45);
-          sleep(100);
-          wobbleArm.setPosition(.2);
-          sleep(100);
-          wobbleClaw.setPosition(.2);
-            sleep(100);
-            wobbleArm.setPosition(0);
-            sleep(100);
+            drive.followTrajectory(move7);
+
+            //yeet wobble two
+            ReleaseWobble();
 
             //park on da line
             Trajectory move8 = drive.trajectoryBuilder(move7.end())
-                    .splineTo(new Vector2d(10, -30), 0)
+                    .splineToLinearHeading(new Pose2d(10, -30, 0), 0)
                     .build();
 
             drive.followTrajectory(move8);
-        } else if (pipeline.getAnalysis() > pipeline.ONE_RING_THRESHOLD) {
 
-            webcam.stopStreaming();
+        } else if (pipeline.getAnalysis() > pipeline.ONE_RING_THRESHOLD) {
             //1 ring
+            webcam.stopStreaming();
+
             //set starting position
             drive.setPoseEstimate(new Pose2d(-63, -43, 0));
 
             //move to behind the stack to shoot
             Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
-                    .splineTo(new Vector2d(-38, -42), 0)
+                    .lineToLinearHeading(new Pose2d(-38, -38, 0))
                     .build();
 
-          drive.followTrajectory(move1);
+            drive.followTrajectory(move1);
 
-          robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
-          robot.loader.indexer.setPosition(1);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.indexer.setPosition(.71);
-          robot.intake.setIntakePower(1);
-          robot.shooter.setShooterVelocity(0);
+            //shoot 3 rings
+            Shoot(3, ANGLE_C);
 
-          //drive into the 1 ring
-          Trajectory move2 = drive.trajectoryBuilder(move1.end())
-                  .splineTo(new Vector2d(-30, -34), 0)
-                  .build();
+            //intake on
+            intake.setPower(-1);
 
-          drive.followTrajectory(move2);
+            //drive into the 1 ring
+            Trajectory move2 = drive.trajectoryBuilder(move1.end())
+                    .splineTo(new Vector2d(-30, -38), 0)
+                    .build();
 
-          //shoot 1 ring
-          robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.loader.indexer.setPosition(1);
-          sleep(200);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.shooter.setShooterVelocity(0);
+            drive.followTrajectory(move2);
 
-          //drive to zone b for wobble one
-          Trajectory move3 = drive.trajectoryBuilder(move2.end())
-                  .splineTo(new Vector2d(24, -32), 0)
-                  .build();
+            //move to the launch line
+            Trajectory move69 = drive.trajectoryBuilder(move2.end())
+                    .splineTo(new Vector2d(-4, -38), 0)
+                    .build();
 
-          drive.followTrajectory(move3);
+            drive.followTrajectory(move2);
 
-          //drop wobble one
-          sleep(1000);
-          //wobble arm down and release
-          wobbleArm.setPosition(.4);
-          sleep(500);
-          wobbleClaw.setPosition(.4);
-          sleep(200);
-          wobbleArm.setPosition(.2);
-          sleep(200);
+            sleep(1000);
 
-          //drive to pick up second wobble
-          Trajectory move4 = drive.trajectoryBuilder(move3.end())
-                  .splineToLinearHeading(new Pose2d(-30, -32, Math.toRadians(180)), 0)
-                  .build();
+            //shoot 1 ring
+            Shoot(1, ANGLE_B);
 
-          drive.followTrajectory(move4);
+            //intake off
+            intake.setPower(0);
 
-          //pick up second wobble
-          sleep(200);
-          wobbleArm.setPosition(.5);
-          sleep(1000);
-          wobbleClaw.setPosition(.15);
-          sleep(1000);
-          wobbleArm.setPosition(.3);
+            //drive to zone b for wobble one
+            Trajectory move3 = drive.trajectoryBuilder(move69.end())
+                    .splineTo(new Vector2d(17.5, -26), 0)
+                    .build();
 
-          //drive to zone a to drop second wobble
-          Trajectory move5 = drive.trajectoryBuilder(move4.end())
-                  .splineToLinearHeading(new Pose2d(25, -32, Math.toRadians(0)), 0)
-                  .build();
+            drive.followTrajectory(move3);
 
-          drive.followTrajectory(move5);
+            //drop wobble one
+            ReleaseWobble();
 
-          //drop second wobble
-          sleep(200);
-          wobbleArm.setPosition(.4);
-          sleep(3000);
-          wobbleClaw.setPosition(.45);
-          sleep(1000);
-          wobbleArm.setPosition(.2);
-          sleep(500);
-          wobbleClaw.setPosition(.2);
-          sleep(500);
-          wobbleArm.setPosition(0);
-          sleep(500);
+            //drive to pick up second wobble
+            Trajectory move4 = drive.trajectoryBuilder(move3.end())
+                    .splineToLinearHeading(new Pose2d(-33, -30, Math.toRadians(180)), 0)
+                    .build();
+
+            drive.followTrajectory(move4);
+
+            //pick up second wobble
+            PickupWobble(500);
+
+            //drive to zone a to drop second wobble
+            Trajectory move5 = drive.trajectoryBuilder(move4.end())
+                    .splineToLinearHeading(new Pose2d(12.5, -26, Math.toRadians(0)), 0)
+                    .build();
+
+            drive.followTrajectory(move5);
+
+            //drop second wobble
+            ReleaseWobble();
 
             //park on the launch line
             Trajectory move6 = drive.trajectoryBuilder(move5.end())
@@ -374,112 +271,141 @@ public class bad extends LinearOpMode {
 
             drive.followTrajectory(move6);
 
-
         } else {
-
-            webcam.stopStreaming();
             //0 ring
+            webcam.stopStreaming();
+
             //set starting position
             drive.setPoseEstimate(new Pose2d(-63, -43, 0));
 
             //move to the launch line
             Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
-                    .splineTo(new Vector2d(0, -42), 0)
+                    .splineTo(new Vector2d(-4, -42), 0)
                     .build();
 
-          drive.followTrajectory(move1);
+            drive.followTrajectory(move1);
 
-          //shoot three rings
-          robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-          robot.shooter.ShootAngle.setPosition(AT_LINE_ANGLE);
-          robot.loader.indexer.setPosition(1);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.5);
-          sleep(LOADER_TIME);
-          robot.loader.loaderServo.setPosition(.83);
-          sleep(LOADER_TIME);
-          robot.shooter.setShooterVelocity(0);
+            //shoot three rings
+            Shoot(3, ANGLE_A);
 
-          //turn towards zone a
-          Trajectory move2 = drive.trajectoryBuilder(move1.end())
-                  .splineToLinearHeading(new Pose2d(-1, -52, Math.toRadians(-25)), 0)
-                  .build();
+            //turn towards zone a
+            Trajectory move2 = drive.trajectoryBuilder(move1.end())
+                    .splineToLinearHeading(new Pose2d(-1, -52, Math.toRadians(-25)), 0)
+                    .build();
 
-          drive.followTrajectory(move2);
+            drive.followTrajectory(move2);
 
-          //drop wobble one
-          wobbleArm.setPosition(.4);
-          sleep(1000);
-          wobbleClaw.setPosition(.35);
-          sleep(200);
-          wobbleArm.setPosition(.2);
+            //drop wobble one
+            ReleaseWobble();
 
+            //drive to pick up second wobble
+            Trajectory move3 = drive.trajectoryBuilder(move2.end())
+                    .splineToLinearHeading(new Pose2d(-31, -29, Math.toRadians(180)), 0)
+                    .build();
 
-          //drive to pick up second wobble
-          Trajectory move3 = drive.trajectoryBuilder(move2.end())
-                  .splineToLinearHeading(new Pose2d(-30, -32, Math.toRadians(180)), 0)
-                  .build();
+            drive.followTrajectory(move3);
 
-          drive.followTrajectory(move3);
+            //pick up second wobble
+            PickupWobble();
 
-          //pick up second wobble
-          sleep(200);
-          wobbleArm.setPosition(.5);
-          sleep(500);
-          wobbleClaw.setPosition(.15);
-          sleep(500);
-          wobbleArm.setPosition(.3);
+            //drive to zone a to drop second wobble
+            Trajectory move4 = drive.trajectoryBuilder(move3.end())
+                    .splineToLinearHeading(new Pose2d(-7, -45, Math.toRadians(-15)), 0)
+                    .build();
 
-          //drive to zone a to drop second wobble
-          Trajectory move4 = drive.trajectoryBuilder(move3.end())
-                  .splineToLinearHeading(new Pose2d(-7, -45, Math.toRadians(-15)), 0)
-                  .build();
+            drive.followTrajectory(move4);
 
-          drive.followTrajectory(move4);
+            ReleaseWobble();
 
-          //drop second wobble
-          sleep(200);
-          wobbleArm.setPosition(.4);
-          sleep(500);
-          wobbleClaw.setPosition(.45);
-          sleep(100);
-          wobbleArm.setPosition(.2);
-          sleep(100);
-          wobbleClaw.setPosition(.2);
-          sleep(100);
-          wobbleArm.setPosition(0);
-          sleep(100);
+            //park on the launch line
+            Trajectory move5 = drive.trajectoryBuilder(move4.end())
+                    .splineToLinearHeading(new Pose2d(10, -30, Math.toRadians(0)), 0)
+                    .build();
 
-          //park on the launch line
-          Trajectory move5 = drive.trajectoryBuilder(move4.end())
-                  .splineToLinearHeading(new Pose2d(10, -30, Math.toRadians(0)), 0)
-                  .build();
-
-          drive.followTrajectory(move5);
-
+            drive.followTrajectory(move5);
 
         }
 
     }
 //------------------------------Methods-Below-Here------------------------------------------------\\
 
-    public static class SkystoneDeterminationPipeline extends OpenCvPipeline
-    {
+    /**
+     * Shoot
+     *
+     * @param Shots
+     * @param ShooterAngle
+     */
+    public void Shoot(double Shots, double ShooterAngle) {
+        //flywheel on
+        //robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
+        //shooter angle
+        robot.shooter.ShootAngle.setPosition(ShooterAngle);
+        //indexer up
+        robot.loader.indexer.setPosition(INDEXER_UP);
+        //wait for shooter to get to speed
+        while (robot.shooter.getShooterVelocity() > FLYWHEEL_VELOCITY - 5) {
+
+            // do nothing and wait
+
+        }
+        //load rings
+        for (double i = 0; i < Shots; i++) {
+            robot.loader.loaderServo.setPosition(.83);
+            sleep(LOADER_TIME);
+            robot.loader.loaderServo.setPosition(.5);
+            sleep(LOADER_TIME);
+        }
+        //loader arm in position
+        robot.loader.loaderServo.setPosition(.83);
+        //flywheel off
+        robot.shooter.setShooterVelocity(0);
+        //indexer down
+        robot.loader.indexer.setPosition(INDEXER_DOWN);
+    }
+
+    /**
+     * ReleaseWobble
+     */
+    public void ReleaseWobble() {
+        wobbleArm.setPosition(.4);
+        sleep(750);
+        wobbleClaw.setPosition(.43);
+        sleep(200);
+        wobbleArm.setPosition(.2);
+    }
+
+    /**
+     * PickupWobble
+     */
+    public void PickupWobble() {
+        wobbleArm.setPosition(.45);
+        sleep(500);
+        wobbleClaw.setPosition(.15);
+        sleep(200);
+        wobbleArm.setPosition(.2);
+        sleep(200);
+    }
+
+    /**
+     * slow boi
+     *
+     * @param sleepTime
+     */
+    public void PickupWobble(long sleepTime) {
+        wobbleArm.setPosition(.45);
+        sleep(500);
+        wobbleClaw.setPosition(.15);
+        sleep(sleepTime);
+        wobbleArm.setPosition(.2);
+        sleep(200);
+    }
+
+    //OpenCV Methods
+    public static class SkystoneDeterminationPipeline extends OpenCvPipeline {
         /*
          * An enum to define the skystone position
          */
-        public enum RingPosition
-        {
+        public enum RingPosition {
             FOUR,
             ONE,
             NONE
@@ -493,13 +419,13 @@ public class bad extends LinearOpMode {
          * The core values which define the location and size of the sample regions
          */
         //location
-        static final Point REGION1_TOP_LEFT_ANCHOR_POINT = new Point(150, 155);
+        static final Point REGION1_TOP_LEFT_ANCHOR_POINT = new Point(158, 155);
         //Size
         static final int REGION_WIDTH = 45;
         static final int REGION_HEIGHT = 30;
         //Threshholds
-        final int FOUR_RING_THRESHOLD = 160;
-        final int ONE_RING_THRESHOLD = 140;
+        final int FOUR_RING_THRESHOLD = 153;
+        final int ONE_RING_THRESHOLD = 137;
 
         Point region1_pointA = new Point(
                 REGION1_TOP_LEFT_ANCHOR_POINT.x,
@@ -523,23 +449,20 @@ public class bad extends LinearOpMode {
          * This function takes the RGB frame, converts to YCrCb,
          * and extracts the Cb channel to the 'Cb' variable
          */
-        void inputToCb(Mat input)
-        {
+        void inputToCb(Mat input) {
             Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
             Core.extractChannel(YCrCb, Cb, 1);
         }
 
         @Override
-        public void init(Mat firstFrame)
-        {
+        public void init(Mat firstFrame) {
             inputToCb(firstFrame);
 
             region1_Cb = Cb.submat(new Rect(region1_pointA, region1_pointB));
         }
 
         @Override
-        public Mat processFrame(Mat input)
-        {
+        public Mat processFrame(Mat input) {
             inputToCb(input);
 
             avg1 = (int) Core.mean(region1_Cb).val[0];
@@ -552,12 +475,12 @@ public class bad extends LinearOpMode {
                     2); // Thickness of the rectangle lines
 
             position = RingPosition.FOUR; // Record our analysis
-            if(avg1 > FOUR_RING_THRESHOLD){
+            if (avg1 > FOUR_RING_THRESHOLD) {
                 position = RingPosition.FOUR;
 
-            }else if (avg1 > ONE_RING_THRESHOLD){
+            } else if (avg1 > ONE_RING_THRESHOLD) {
                 position = RingPosition.ONE;
-            }else{
+            } else {
                 position = RingPosition.NONE;
             }
 
@@ -571,13 +494,12 @@ public class bad extends LinearOpMode {
             return input;
         }
 
-        public int getAnalysis()
-        {
+        public int getAnalysis() {
             return avg1;
         }
 
     }
 
 
-    }
+}
 
