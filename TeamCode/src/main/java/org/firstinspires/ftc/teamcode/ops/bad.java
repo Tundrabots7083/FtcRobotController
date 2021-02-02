@@ -36,7 +36,7 @@ public class bad extends LinearOpMode {
     OpenCvCamera webcam;
     SkystoneDeterminationPipeline pipeline;
     //shooter
-    private double SHOOTER_RPM = 7000;
+    private double SHOOTER_RPM = 6000;
     private double TICKS_PER_ROTATION = 14;
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
     //motors

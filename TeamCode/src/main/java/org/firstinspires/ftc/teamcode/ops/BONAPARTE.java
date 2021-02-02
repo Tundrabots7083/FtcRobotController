@@ -86,12 +86,13 @@ public class BONAPARTE extends LinearOpMode {
 
             if (gamepad1.left_bumper)
             {
-                robot.shooter.setShooterPower(.75);
+                robot.shooter.setShooterPower(.7);
+                robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
                 robot.loader.indexer.setPosition(1);
             }
             else
             {
-                robot.shooter.setShooterPower(0);
+                robot.shooter.setShooterVelocity(0);
             }
 
             if (gamepad1.right_bumper)
