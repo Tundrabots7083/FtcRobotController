@@ -49,9 +49,9 @@ public class bad extends LinearOpMode {
     private long LOADER_TIME = 300;
     private double INDEXER_UP = 1;
     private double INDEXER_DOWN = 0.65;
-    private double ANGLE_A = 0.85; // at shooting line
-    private double ANGLE_B = 0.85; //halfway
-    private double ANGLE_C = 0.84; //behind the stack
+    private double ANGLE_A = 0.77; // at shooting line
+    private double ANGLE_B = 0.80; //halfway
+    private double ANGLE_C = 0.82; //behind the stack
 
 
     @Override
@@ -353,13 +353,13 @@ public class bad extends LinearOpMode {
      */
     public void Shoot(double Shots, double ShooterAngle) {
         //flywheel on
-        robot.shooter.setShooterPower(.75);
+        robot.shooter.setShooterPower(.85);
         //shooter angle
         robot.shooter.ShootAngle.setPosition(ShooterAngle);
         //indexer up
         robot.loader.indexer.setPosition(INDEXER_UP);
         //wait for shooter to get to speed
-        sleep(500);
+        sleep(1200);
         //load rings
         for (double i = 0; i < Shots; i++) {
             robot.loader.loaderServo.setPosition(.83);
