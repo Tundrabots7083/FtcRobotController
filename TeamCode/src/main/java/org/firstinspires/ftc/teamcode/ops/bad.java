@@ -46,12 +46,13 @@ public class bad extends LinearOpMode {
     public Servo wobbleArm;
     public Servo wobbleClaw;
     //variables
-    private long LOADER_TIME = 300;
+    private long LOADER_TIME = 400;
     private double INDEXER_UP = 1;
     private double INDEXER_DOWN = 0.65;
-    private double ANGLE_A = 0.77; // at shooting line
-    private double ANGLE_B = 0.80; //halfway
-    private double ANGLE_C = 0.82; //behind the stack
+    private double ANGLE_A = 0.8085; // at shooting line
+    private double ANGLE_B = 0.808; //halfway
+    private double ANGLE_C = 0.809; //behind the stack
+    private double ANGLE_GAY = 0.8075;
 
 
     @Override
@@ -97,7 +98,7 @@ public class bad extends LinearOpMode {
 
 
         // uncomment while loop to tweak camera comment for robot to sense then do drive paths
-            /*while (opModeIsActive())
+           /* while (opModeIsActive())
             {
             telemetry.addData("Analysis", pipeline.getAnalysis());
             telemetry.addData("Position",pipeline.position);
@@ -173,7 +174,7 @@ public class bad extends LinearOpMode {
 
             //go pickup wobble 2
             Trajectory move6 = drive.trajectoryBuilder(move5.end())
-                    .lineToLinearHeading(new Pose2d(-31, -29, Math.toRadians(180)))
+                    .lineToLinearHeading(new Pose2d(-31, -31, Math.toRadians(180)))
                     .build();
 
             drive.followTrajectory(move6);
@@ -199,8 +200,8 @@ public class bad extends LinearOpMode {
 
 
 
-            /*
-            //park on da line
+
+        /*    //park on da line
             Trajectory move8 = drive.trajectoryBuilder(move7.end())
                     .splineToLinearHeading(new Pose2d(10, -30, 0), 0)
                     .build();
@@ -208,8 +209,10 @@ public class bad extends LinearOpMode {
             drive.followTrajectory(move8);
              */
 
+
         } else if (pipeline.getAnalysis() > pipeline.ONE_RING_THRESHOLD) {
             //1 ring
+
             webcam.stopStreaming();
 
             //set starting position
@@ -237,7 +240,7 @@ public class bad extends LinearOpMode {
 
             //move to the launch line
             Trajectory move69 = drive.trajectoryBuilder(move2.end())
-                    .splineTo(new Vector2d(-4, -38), 0)
+                    .splineTo(new Vector2d(-3.5, -38), 0)
                     .build();
 
             drive.followTrajectory(move2);
@@ -245,7 +248,7 @@ public class bad extends LinearOpMode {
             sleep(1000);
 
             //shoot 1 ring
-            Shoot(1, ANGLE_B);
+            Shoot(2, ANGLE_B);
 
             //intake off
             intake.setPower(0);
@@ -262,17 +265,17 @@ public class bad extends LinearOpMode {
 
             //drive to pick up second wobble
             Trajectory move4 = drive.trajectoryBuilder(move3.end())
-                    .splineToLinearHeading(new Pose2d(-33, -30, Math.toRadians(180)), 0)
+                    .lineToLinearHeading(new Pose2d(-32, -31, Math.toRadians(180)))
                     .build();
 
             drive.followTrajectory(move4);
 
             //pick up second wobble
-            PickupWobble(500);
+            PickupWobble();
 
             //drive to zone a to drop second wobble
             Trajectory move5 = drive.trajectoryBuilder(move4.end())
-                    .splineToLinearHeading(new Pose2d(12.5, -26, Math.toRadians(0)), 0)
+                    .splineToLinearHeading(new Pose2d(16, -25, Math.toRadians(0)), 0)
                     .build();
 
             drive.followTrajectory(move5);
@@ -302,7 +305,7 @@ public class bad extends LinearOpMode {
             drive.followTrajectory(move1);
 
             //shoot three rings
-            Shoot(3, ANGLE_A);
+            Shoot(3, ANGLE_GAY);
 
             //turn towards zone a
             Trajectory move2 = drive.trajectoryBuilder(move1.end())
@@ -353,7 +356,7 @@ public class bad extends LinearOpMode {
      */
     public void Shoot(double Shots, double ShooterAngle) {
         //flywheel on
-        robot.shooter.setShooterPower(.85);
+        robot.shooter.setShooterPower(.75);
         //shooter angle
         robot.shooter.ShootAngle.setPosition(ShooterAngle);
         //indexer up
@@ -414,7 +417,7 @@ public class bad extends LinearOpMode {
      * ReleaseWobble
      */
     public void ReleaseWobble() {
-        wobbleArm.setPosition(.4);
+        wobbleArm.setPosition(.5);
         sleep(750);
         wobbleClaw.setPosition(.43);
         sleep(200);
@@ -425,7 +428,7 @@ public class bad extends LinearOpMode {
      * PickupWobble
      */
     public void PickupWobble() {
-        wobbleArm.setPosition(.45);
+        wobbleArm.setPosition(.5);
         sleep(500);
         wobbleClaw.setPosition(.15);
         sleep(200);
