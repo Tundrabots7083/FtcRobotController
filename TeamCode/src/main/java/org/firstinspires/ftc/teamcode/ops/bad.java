@@ -483,6 +483,7 @@ public class bad extends LinearOpMode {
         ElapsedTime shotTimer = new ElapsedTime();
         // repeat while we havent finished shooting
         while (!hasFinished) {
+            boolean shootingCondition = Math.abs(myMotor1.getVelocity()) + 500 > Math.abs(targetVelo);
             // do pid stuff
             veloController.setTargetVelocity(targetVelo);
             veloController.setTargetAcceleration((targetVelo - lastTargetVelo) / veloTimer.seconds());
@@ -506,7 +507,7 @@ public class bad extends LinearOpMode {
                     // 70 comes from quick napkin math to give 100 rpm of tolerance i think
                     // because 100 / 60 * (3/2) * 28 = 70
                     // idk if i did that right lol, probably not
-                    if (Math.abs(myMotor1.getVelocity()) + 150 > Math.abs(targetVelo)) {
+                    if (shootingCondition) {
                         // reset timer
                         shotTimer.reset();
                         shooterState = pidShooterStates.SHOOT;
@@ -537,7 +538,7 @@ public class bad extends LinearOpMode {
             telemetry.addData("shooter state",shooterState);
             telemetry.addData("shooter velo",myMotor1.getVelocity());
             telemetry.addData("target velo ",targetVelo);
-            telemetry.addData("shooting condition = ",Math.abs(myMotor1.getVelocity()) + 150 > Math.abs(targetVelo));
+            telemetry.addData("shooting condition = ",shootingCondition);
             telemetry.update();
             // exit condition
             if (numberOfShotsTaken >= Shots) {
