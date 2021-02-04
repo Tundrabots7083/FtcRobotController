@@ -86,7 +86,7 @@ public class bad extends LinearOpMode {
     DcMotorEx myMotor1;
     DcMotorEx myMotor2;
     double power;
-
+    double targetVelo;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -171,7 +171,7 @@ public class bad extends LinearOpMode {
         double SHOOTER_RPM = 4750;
         double TICKS_PER_ROTATION = 28 * (3 / 2);
         double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
-        double targetVelo = FLYWHEEL_VELOCITY;
+        targetVelo = FLYWHEEL_VELOCITY;
 
         // Call necessary controller methods
         veloController.setTargetVelocity(targetVelo);
@@ -211,7 +211,7 @@ public class bad extends LinearOpMode {
             drive.followTrajectory(move1);
 
             //shoot three rings
-            Shoot(3, ANGLE_C);
+            ShootPID(3, ANGLE_C);
 
             //intake on
             intake.setPower(-1);
@@ -226,7 +226,7 @@ public class bad extends LinearOpMode {
             sleep(1500);
 
             //shoot three rings
-            Shoot(3, ANGLE_B);
+            ShootPID(3, ANGLE_B);
 
             //drive to line to shoot again
             Trajectory move4 = drive.trajectoryBuilder(move2.end())
@@ -238,7 +238,7 @@ public class bad extends LinearOpMode {
             sleep(3000);
 
             //shoot three rings
-            Shoot(3, ANGLE_A);
+            ShootPID(3, ANGLE_A);
 
             //intake off
             intake.setPower(0);
@@ -305,7 +305,7 @@ public class bad extends LinearOpMode {
             drive.followTrajectory(move1);
 
             //shoot 3 rings
-            Shoot(3, ANGLE_C);
+            ShootPID(3, ANGLE_C);
 
             //intake on
             intake.setPower(-1);
@@ -327,7 +327,7 @@ public class bad extends LinearOpMode {
             sleep(1000);
 
             //shoot 1 ring
-            Shoot(1, ANGLE_B);
+            ShootPID(1, ANGLE_B);
 
             //intake off
             intake.setPower(0);
@@ -384,7 +384,7 @@ public class bad extends LinearOpMode {
             drive.followTrajectory(move1);
 
             //shoot three rings
-            Shoot(3, ANGLE_A);
+            ShootPID(3, ANGLE_A);
 
             //turn towards zone a
             Trajectory move2 = drive.trajectoryBuilder(move1.end())
@@ -430,10 +430,11 @@ public class bad extends LinearOpMode {
     /**
      * Shoot
      *
-     * @param Shots
-     * @param ShooterAngle
+     * @param Shots number of shots we take
+     * @param ShooterAngle the angle we want to shoot at
      */
     public void Shoot(double Shots, double ShooterAngle) {
+
         //flywheel on
         myMotor1.setPower(power);
         myMotor2.setPower(power);
@@ -451,6 +452,95 @@ public class bad extends LinearOpMode {
             sleep(LOADER_TIME);
         }
         //loader arm in position
+        robot.loader.loaderServo.setPosition(.83);
+        //flywheel off
+        myMotor1.setPower(0);
+        myMotor2.setPower(0);
+        //indexer down
+        robot.loader.indexer.setPosition(INDEXER_DOWN);
+    }
+
+    /**
+     * shoots but uses pid lul
+     *
+     * mentor code moment from ben caunt the imovie god
+     *
+     * @param Shots
+     * @param ShooterAngle
+     */
+    public void ShootPID(double Shots, double ShooterAngle) {
+
+        //shooter angle
+        robot.shooter.ShootAngle.setPosition(ShooterAngle);
+        //indexer up
+        robot.loader.indexer.setPosition(INDEXER_UP);
+
+        // has finished shooting
+        boolean hasFinished = false;
+        int numberOfShotsTaken = 0;
+        pidShooterStates shooterState = pidShooterStates.READY;
+        // time for shots
+        ElapsedTime shotTimer = new ElapsedTime();
+        // repeat while we havent finished shooting
+        while (!hasFinished) {
+            // do pid stuff
+            veloController.setTargetVelocity(targetVelo);
+            veloController.setTargetAcceleration((targetVelo - lastTargetVelo) / veloTimer.seconds());
+            veloTimer.reset();
+
+            lastTargetVelo = targetVelo;
+
+            // Get the velocity from the motor with the encoder
+            double motorPos = myMotor1.getCurrentPosition();
+            double motorVelo = myMotor1.getVelocity();
+
+            // Update the controller and set the power for each motor
+            power = veloController.update(motorPos, motorVelo);
+            // set motor powers
+            myMotor1.setPower(power);
+            myMotor2.setPower(power);
+
+            switch (shooterState) {
+                case READY:
+                    // shoot if the flywheel is up to speed shoot
+                    // 70 comes from quick napkin math to give 100 rpm of tolerance i think
+                    // because 100 / 60 * (3/2) * 28 = 70
+                    // idk if i did that right lol, probably not
+                    if (Math.abs(myMotor1.getVelocity()) + 70 > Math.abs(targetVelo)) {
+                        // reset timer
+                        shotTimer.reset();
+                        shooterState = pidShooterStates.SHOOT;
+                        numberOfShotsTaken += 1;
+                    }
+                    break;
+                case SHOOT:
+
+                    robot.loader.loaderServo.setPosition(.83);
+                    if (shotTimer.milliseconds() > LOADER_TIME) {
+                        shooterState = pidShooterStates.RETRACT;
+                        shotTimer.reset();
+                    }
+
+
+                    break;
+                case RETRACT:
+                    robot.loader.loaderServo.setPosition(.5);
+                    if (shotTimer.milliseconds() > LOADER_TIME) {
+                        shooterState = pidShooterStates.SHOOT;
+                        shotTimer.reset();
+                    }
+                    break;
+            }
+
+
+            // exit condition
+            if (numberOfShotsTaken >= Shots) {
+                hasFinished = true;
+            }
+
+
+        }
+
         robot.loader.loaderServo.setPosition(.83);
         //flywheel off
         myMotor1.setPower(0);
@@ -629,6 +719,17 @@ public class bad extends LinearOpMode {
             return avg1;
         }
 
+    }
+
+
+    /**
+     * enum states for pidShooter
+     */
+    public enum pidShooterStates {
+        READY,
+        START_WHEEL,
+        SHOOT,
+        RETRACT,
     }
 
 
