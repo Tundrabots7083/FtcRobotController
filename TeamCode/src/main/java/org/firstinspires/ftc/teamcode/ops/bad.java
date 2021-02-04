@@ -506,7 +506,7 @@ public class bad extends LinearOpMode {
                     // 70 comes from quick napkin math to give 100 rpm of tolerance i think
                     // because 100 / 60 * (3/2) * 28 = 70
                     // idk if i did that right lol, probably not
-                    if (Math.abs(myMotor1.getVelocity()) + 70 > Math.abs(targetVelo)) {
+                    if (Math.abs(myMotor1.getVelocity()) + 150 > Math.abs(targetVelo)) {
                         // reset timer
                         shotTimer.reset();
                         shooterState = pidShooterStates.SHOOT;
@@ -528,11 +528,13 @@ public class bad extends LinearOpMode {
                     if (shotTimer.milliseconds() > LOADER_TIME) {
                         shooterState = pidShooterStates.SHOOT;
                         shotTimer.reset();
+                        numberOfShotsTaken += 1;
                     }
                     break;
             }
 
 
+            telemetry.addData("shooter state",shooterState);
             // exit condition
             if (numberOfShotsTaken >= Shots) {
                 hasFinished = true;
