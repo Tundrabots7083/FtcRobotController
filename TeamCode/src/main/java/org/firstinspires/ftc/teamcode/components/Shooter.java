@@ -43,17 +43,17 @@ public class Shooter extends BotComponent {
 
         //define and initialize motors
 
-        Shooter1 = initMotorEx(shooter1Name, DcMotor.Direction.FORWARD);
-        Shooter2 = initMotorEx(shooter2Name, DcMotor.Direction.FORWARD);
+        //  Shooter1 = initMotorEx(shooter1Name, DcMotor.Direction.FORWARD);
+        //Shooter2 = initMotorEx(shooter2Name, DcMotor.Direction.FORWARD);
         ShootAngle = initServo(shooterAngle, .75);
 
 
-        if (Shooter1 != null) {
+     /*   if (Shooter1 != null) {
             isAvailable = true;
         }
         if (Shooter2 != null) {
             isAvailable = true;
-        }
+        }*/
         if (ShootAngle != null) {
             isAvailable = true;
         }
@@ -82,5 +82,4 @@ public class Shooter extends BotComponent {
     public double getShooterVelocity() {
         return (Shooter1.getVelocity() / 14) * 60;
     }
-
 }

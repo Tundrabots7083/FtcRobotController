@@ -2,16 +2,21 @@ package org.firstinspires.ftc.teamcode.ops;
 
 import android.graphics.PostProcessor;
 
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.TuningController;
+import org.firstinspires.ftc.teamcode.VelocityPIDFController;
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.opencv.core.Core;
@@ -35,10 +40,35 @@ public class bad extends LinearOpMode {
     //OpenCV declaration
     OpenCvCamera webcam;
     SkystoneDeterminationPipeline pipeline;
+
+    //shooter pid nonsense
+    // Copy your PID Coefficients here
+    public static PIDCoefficients MOTOR_VELO_PID = new PIDCoefficients(0.0016, 0, 0.0000016);
+
+    // Copy your feedforward gains here
+    public static double kV = 0.000435 / TuningController.rpmToTicksPerSecond(TuningController.MOTOR_MAX_RPM);
+    public static double kA = 0.00015;
+    public static double kStatic = 0;
+
+    // Timer for calculating desired acceleration
+    // Necessary for kA to have an affect
+    private final ElapsedTime veloTimer = new ElapsedTime();
+    private double lastTargetVelo = 0.0;
+
+    // Our velocity controller
+    private final VelocityPIDFController veloController = new VelocityPIDFController(MOTOR_VELO_PID, kV, kA, kStatic);
+
+    //end of pid stuff idk
+
     //shooter
+   /*
     private double SHOOTER_RPM = 6000;
     private double TICKS_PER_ROTATION = 14;
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
+
+   */
+    //I THINK I CAN COMMENT THIS STUFF OUT BECAUSE ITS DOWN THERE SOMEWHERE IDK
+
     //motors
     public DcMotor intake = null;
 
@@ -53,14 +83,38 @@ public class bad extends LinearOpMode {
     private double ANGLE_B = 0.85; //halfway
     private double ANGLE_C = 0.84; //behind the stack
 
+    DcMotorEx myMotor1;
+    DcMotorEx myMotor2;
+    double power;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
 
+        //morepid
+        // SETUP MOTORS //
+        // Change my id
+        myMotor1 = hardwareMap.get(DcMotorEx.class, "shooterOne");
+        myMotor2 = hardwareMap.get(DcMotorEx.class, "shooterTwo");
+
+        // Reverse as appropriate
+        //myMotor1.setDirection(DcMotor.Direction.REVERSE);
+        // myMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Ensure that RUN_USING_ENCODER is not set
+        myMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        myMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        // Turns on bulk reading
+        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
+        //more pid
+
+
         wobbleClaw = hardwareMap.get(Servo.class, "wobbleClaw");
         wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
         intake = hardwareMap.get(DcMotor.class, "rightIntake");
-
 
 
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
@@ -106,6 +160,34 @@ public class bad extends LinearOpMode {
             }*/
         //sleeps for camera to have time to sense tweak to whatever is good
         sleep(1000);
+
+        //PID STUFF AAAAA
+
+
+        ///// Run the velocity controller ////
+
+        // Target velocity in ticks per second
+
+        double SHOOTER_RPM = 4750;
+        double TICKS_PER_ROTATION = 28 * (3 / 2);
+        double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
+        double targetVelo = FLYWHEEL_VELOCITY;
+
+        // Call necessary controller methods
+        veloController.setTargetVelocity(targetVelo);
+        veloController.setTargetAcceleration((targetVelo - lastTargetVelo) / veloTimer.seconds());
+        veloTimer.reset();
+
+        lastTargetVelo = targetVelo;
+
+        // Get the velocity from the motor with the encoder
+        double motorPos = myMotor1.getCurrentPosition();
+        double motorVelo = myMotor1.getVelocity();
+
+        // Update the controller and set the power for each motor
+        double power = veloController.update(motorPos, motorVelo);
+
+        //PID STUFF AAAAAAAAAAAA IDK WHAT IM DOING
 
 
 //------------------------------Drive-Paths-Below-------------------------------------------------\\
@@ -353,7 +435,8 @@ public class bad extends LinearOpMode {
      */
     public void Shoot(double Shots, double ShooterAngle) {
         //flywheel on
-        robot.shooter.setShooterPower(.75);
+        myMotor1.setPower(power);
+        myMotor2.setPower(power);
         //shooter angle
         robot.shooter.ShootAngle.setPosition(ShooterAngle);
         //indexer up
@@ -370,7 +453,8 @@ public class bad extends LinearOpMode {
         //loader arm in position
         robot.loader.loaderServo.setPosition(.83);
         //flywheel off
-        robot.shooter.setShooterPower(0);
+        myMotor1.setPower(0);
+        myMotor2.setPower(0);
         //indexer down
         robot.loader.indexer.setPosition(INDEXER_DOWN);
     }
@@ -381,7 +465,7 @@ public class bad extends LinearOpMode {
      * @param Shots
      * @param ShooterAngle
      */
-    public void bad(double Shots, double ShooterAngle) {
+   /* public void bad(double Shots, double ShooterAngle) {
         //flywheel on
         robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
         //shooter angle
@@ -408,7 +492,7 @@ public class bad extends LinearOpMode {
         //indexer down
         robot.loader.indexer.setPosition(INDEXER_DOWN);
     }
-
+*/
 
     /**
      * ReleaseWobble
