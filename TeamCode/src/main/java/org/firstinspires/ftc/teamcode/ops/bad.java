@@ -535,6 +535,10 @@ public class bad extends LinearOpMode {
 
 
             telemetry.addData("shooter state",shooterState);
+            telemetry.addData("shooter velo",myMotor1.getVelocity());
+            telemetry.addData("target velo ",targetVelo);
+            telemetry.addData("shooting condition = ",Math.abs(myMotor1.getVelocity()) + 150 > Math.abs(targetVelo));
+            telemetry.update();
             // exit condition
             if (numberOfShotsTaken >= Shots) {
                 hasFinished = true;
