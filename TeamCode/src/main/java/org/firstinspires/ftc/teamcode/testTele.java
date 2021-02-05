@@ -104,7 +104,7 @@ public class testTele extends LinearOpMode {
 
             // Target velocity in ticks per second
 
-            double SHOOTER_RPM = 4750;
+            double SHOOTER_RPM = 4525;
             double TICKS_PER_ROTATION = 28 * (3 / 2);
             double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
             double targetVelo = FLYWHEEL_VELOCITY;

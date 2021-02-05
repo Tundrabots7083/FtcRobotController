@@ -79,9 +79,9 @@ public class bad extends LinearOpMode {
     private long LOADER_TIME = 300;
     private double INDEXER_UP = 1;
     private double INDEXER_DOWN = 0.65;
-    private double ANGLE_A = 0.85; // at shooting line
-    private double ANGLE_B = 0.85; //halfway
-    private double ANGLE_C = 0.84; //behind the stack
+    private double ANGLE_A = 0.84; // at shooting line
+    private double ANGLE_B = 0.815; //halfway
+    private double ANGLE_C = 0.809; //behind the stack
 
     DcMotorEx myMotor1;
     DcMotorEx myMotor2;
@@ -245,7 +245,7 @@ public class bad extends LinearOpMode {
 
             //drop off wobble 1
             Trajectory move5 = drive.trajectoryBuilder(move4.end())
-                    .lineToLinearHeading(new Pose2d(49, -51, Math.toRadians(-25)))
+                    .lineToLinearHeading(new Pose2d(49, -44, Math.toRadians(-25)))
                     .build();
 
             drive.followTrajectory(move5);
@@ -255,7 +255,7 @@ public class bad extends LinearOpMode {
 
             //go pickup wobble 2
             Trajectory move6 = drive.trajectoryBuilder(move5.end())
-                    .lineToLinearHeading(new Pose2d(-31, -29, Math.toRadians(180)))
+                    .lineToLinearHeading(new Pose2d(-34, -31, Math.toRadians(180)))
                     .build();
 
             drive.followTrajectory(move6);
@@ -265,7 +265,7 @@ public class bad extends LinearOpMode {
 
             //drop off wobble 2
             Trajectory move7 = drive.trajectoryBuilder(move6.end())
-                    .lineToLinearHeading(new Pose2d(40, -41, Math.toRadians(-17)))
+                    .lineToLinearHeading(new Pose2d(46, -38, Math.toRadians(-17)))
                     .build();
 
             drive.followTrajectory(move7);
@@ -326,8 +326,8 @@ public class bad extends LinearOpMode {
 
             sleep(1000);
 
-            //shoot 1 ring
-            ShootPID(1, ANGLE_B);
+            //shoot 1 ring 3 attempts
+            ShootPID(3, ANGLE_B);
 
             //intake off
             intake.setPower(0);
@@ -344,7 +344,7 @@ public class bad extends LinearOpMode {
 
             //drive to pick up second wobble
             Trajectory move4 = drive.trajectoryBuilder(move3.end())
-                    .splineToLinearHeading(new Pose2d(-33, -30, Math.toRadians(180)), 0)
+                    .splineToLinearHeading(new Pose2d(-33, -28, Math.toRadians(180)), 0)
                     .build();
 
             drive.followTrajectory(move4);
@@ -378,7 +378,7 @@ public class bad extends LinearOpMode {
 
             //move to the launch line
             Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
-                    .splineTo(new Vector2d(-4, -42), 0)
+                    .splineTo(new Vector2d(-4, -38), 0)
                     .build();
 
             drive.followTrajectory(move1);
@@ -541,7 +541,7 @@ public class bad extends LinearOpMode {
             telemetry.addData("shooting condition = ",shootingCondition);
             telemetry.update();
             // exit condition
-            if (numberOfShotsTaken >= Shots) {
+            if (numberOfShotsTaken > Shots) {
                 hasFinished = true;
             }
 
@@ -606,7 +606,7 @@ public class bad extends LinearOpMode {
      * PickupWobble
      */
     public void PickupWobble() {
-        wobbleArm.setPosition(.45);
+        wobbleArm.setPosition(.5);
         sleep(500);
         wobbleClaw.setPosition(.15);
         sleep(200);
@@ -620,7 +620,7 @@ public class bad extends LinearOpMode {
      * @param sleepTime
      */
     public void PickupWobble(long sleepTime) {
-        wobbleArm.setPosition(.45);
+        wobbleArm.setPosition(.5);
         sleep(500);
         wobbleClaw.setPosition(.15);
         sleep(sleepTime);
