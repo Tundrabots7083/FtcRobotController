@@ -161,11 +161,11 @@ public class testTele extends LinearOpMode {
             }
 
             if (gamepad1.dpad_down) {
-                //change values
-                robot.shooter.ShootAngle.setPosition(.85);
+                //powershots
+                robot.shooter.ShootAngle.setPosition(.81);
             } else if (gamepad1.dpad_up) {
-                //change values
-                robot.shooter.ShootAngle.setPosition(.83);
+                //highgoal
+                robot.shooter.ShootAngle.setPosition(.85);
             }
 
             if (gamepad1.y) {
