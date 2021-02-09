@@ -106,7 +106,7 @@ public class triangles extends LinearOpMode {
                 double opp = Math.sqrt(Math.pow(goalCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2)); //goalCoordX - robotCoordX;
                 double adj = Math.sqrt(Math.pow(robotCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2));
                 double robotAngle = opp / adj;
-                drive.turn(Math.toRadians((double)(currentRotation + (-90 - currentRotation)) + robotAngle));
+                drive.turn(Math.toRadians((currentRotation + (-90 - currentRotation)) + robotAngle));
                 robot.shooter.setShooterPower(.7);
                 robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
                 robot.loader.indexer.setPosition(1);
