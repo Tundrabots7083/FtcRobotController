@@ -103,8 +103,8 @@ public class triangles extends LinearOpMode {
             if (gamepad1.left_bumper)
             {
                 //calculate triangle things
-                double opp = Math.sqrt((double)Math.pow(goalCoordX - robotCoordX, 2) + (double)Math.pow(goalCoordy - robotCoordY, 2)); //goalCoordX - robotCoordX;
-                double adj = Math.sqrt((double)Math.pow(robotCoordX - robotCoordX, 2) + (double)Math.pow(goalCoordy - robotCoordY, 2));
+                double opp = Math.sqrt(Math.pow(goalCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2)); //goalCoordX - robotCoordX;
+                double adj = Math.sqrt(Math.pow(robotCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2));
                 double robotAngle = opp / adj;
                 drive.turn(Math.toRadians((double)(currentRotation + (-90 - currentRotation)) + robotAngle));
                 robot.shooter.setShooterPower(.7);
