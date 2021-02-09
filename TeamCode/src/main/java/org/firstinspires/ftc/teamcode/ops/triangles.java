@@ -154,7 +154,7 @@ public class triangles extends LinearOpMode {
                 drive.followTrajectory(powershots);
             }
 
-            if     (gamepad1.y)
+            if(gamepad1.y)
             {
                 wobbleArm.setPosition(.4);
                 sleep(200);
