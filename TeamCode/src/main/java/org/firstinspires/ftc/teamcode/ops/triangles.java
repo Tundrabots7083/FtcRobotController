@@ -34,11 +34,12 @@ public class triangles extends LinearOpMode {
     private double TICKS_PER_ROTATION = 14;
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
 
-    private int goalCoordX = 70;
-    private int goalCoordy = -46;
+    private double goalCoordX = 81;
+    private double goalCoordy = -40.5;
 
-    private int robotCoordX = 0;
-    private int robotCoordY = 0;
+    private double robotCoordX = 0;
+    private double robotCoordY = 0;
+    private double currentRotation = 0;
 
 
     public Servo wobbleArm;
@@ -78,8 +79,9 @@ public class triangles extends LinearOpMode {
 
         while (opModeIsActive()) {
             Pose2d position = drive.getPoseEstimate();
-            robotCoordX = (int)position.getX();
-            robotCoordY = (int)position.getY();
+            robotCoordX = (double)position.getX();
+            robotCoordY = (double)position.getY();
+            currentRotation = (double)position.getHeading();
 
             //field oriented gamepad stuff
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
@@ -101,10 +103,10 @@ public class triangles extends LinearOpMode {
             if (gamepad1.left_bumper)
             {
                 //calculate triangle things
-                int opp = goalCoordX - robotCoordX;
-                int adj = goalCoordy - robotCoordY;
-                int robotAngle = opp / adj;
-                drive.turn(Math.toRadians(robotAngle));
+                double opp = Math.sqrt((double)Math.pow(goalCoordX - robotCoordX, 2) + (double)Math.pow(goalCoordy - robotCoordY, 2)); //goalCoordX - robotCoordX;
+                double adj = Math.sqrt((double)Math.pow(robotCoordX - robotCoordX, 2) + (double)Math.pow(goalCoordy - robotCoordY, 2));
+                double robotAngle = opp / adj;
+                drive.turn(Math.toRadians((double)(currentRotation + (-90 - currentRotation)) + robotAngle));
                 robot.shooter.setShooterPower(.7);
                 robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
                 robot.loader.indexer.setPosition(1);
