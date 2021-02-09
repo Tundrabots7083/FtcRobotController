@@ -129,6 +129,8 @@ public class BONAPARTpower extends LinearOpMode {
                 sleep(200);
                 wobbleArm.setPosition(0);
             }
+
+            if(gamepad1.)
             telemetry.addData("Shooter velocity: ",robot.shooter.getShooterVelocity());
             telemetry.update();
         }
