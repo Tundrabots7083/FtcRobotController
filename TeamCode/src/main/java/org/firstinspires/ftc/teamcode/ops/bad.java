@@ -255,7 +255,7 @@ public class bad extends LinearOpMode {
 
             //go pickup wobble 2
             Trajectory move6 = drive.trajectoryBuilder(move5.end())
-                    .lineToLinearHeading(new Pose2d(-34, -31, Math.toRadians(180)))
+                    .lineToLinearHeading(new Pose2d(-32, -29, Math.toRadians(180)))
                     .build();
 
             drive.followTrajectory(move6);
@@ -265,7 +265,7 @@ public class bad extends LinearOpMode {
 
             //drop off wobble 2
             Trajectory move7 = drive.trajectoryBuilder(move6.end())
-                    .lineToLinearHeading(new Pose2d(46, -38, Math.toRadians(-17)))
+                    .lineToLinearHeading(new Pose2d(44, -41, Math.toRadians(-17)))
                     .build();
 
             drive.followTrajectory(move7);
@@ -299,7 +299,7 @@ public class bad extends LinearOpMode {
 
             //move to behind the stack to shoot
             Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
-                    .lineToLinearHeading(new Pose2d(-38, -38, 0))
+                    .lineToLinearHeading(new Pose2d(-38, -40, 0))
                     .build();
 
             drive.followTrajectory(move1);
@@ -312,14 +312,14 @@ public class bad extends LinearOpMode {
 
             //drive into the 1 ring
             Trajectory move2 = drive.trajectoryBuilder(move1.end())
-                    .splineTo(new Vector2d(-30, -38), 0)
+                    .splineTo(new Vector2d(-30, -40), 0)
                     .build();
 
             drive.followTrajectory(move2);
 
             //move to the launch line
             Trajectory move69 = drive.trajectoryBuilder(move2.end())
-                    .splineTo(new Vector2d(-4, -38), 0)
+                    .splineTo(new Vector2d(-4, -40), 0)
                     .build();
 
             drive.followTrajectory(move2);
@@ -344,7 +344,7 @@ public class bad extends LinearOpMode {
 
             //drive to pick up second wobble
             Trajectory move4 = drive.trajectoryBuilder(move3.end())
-                    .splineToLinearHeading(new Pose2d(-33, -28, Math.toRadians(180)), 0)
+                    .lineToLinearHeading(new Pose2d(-32, -31, Math.toRadians(180)))
                     .build();
 
             drive.followTrajectory(move4);
@@ -354,7 +354,7 @@ public class bad extends LinearOpMode {
 
             //drive to zone a to drop second wobble
             Trajectory move5 = drive.trajectoryBuilder(move4.end())
-                    .splineToLinearHeading(new Pose2d(12.5, -26, Math.toRadians(0)), 0)
+                    .splineToLinearHeading(new Pose2d(16, -29, Math.toRadians(0)), 0)
                     .build();
 
             drive.followTrajectory(move5);
@@ -378,7 +378,7 @@ public class bad extends LinearOpMode {
 
             //move to the launch line
             Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
-                    .splineTo(new Vector2d(-4, -38), 0)
+                    .splineTo(new Vector2d(-4, -46), 0)
                     .build();
 
             drive.followTrajectory(move1);
