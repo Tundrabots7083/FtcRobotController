@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.ops;
 import android.net.wifi.hotspot2.omadm.PpsMoParser;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,7 +20,7 @@ import org.firstinspires.ftc.teamcode.components.Intake;
 import org.firstinspires.ftc.teamcode.components.Loader;
 import org.firstinspires.ftc.teamcode.components.Shooter;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.geometry.Vector2d;
+//import org.firstinspires.ftc.teamcode.geometry.Vector2d;
 
 
 
@@ -136,6 +138,20 @@ public class triangles extends LinearOpMode {
             {
                 //change values
                 robot.shooter.ShootAngle.setPosition(.83);
+            }
+
+            if (gamepad1.dpad_right) {
+                double degrees = 0;
+                if ((Math.abs(currentRotation)) >= 180) {
+                    degrees = (double)(360 - currentRotation);
+                } else {
+                    degrees = (double)(currentRotation - 180);
+                }
+                Trajectory powershots = drive.trajectoryBuilder(position)
+                        .lineToSplineHeading(new Pose2d(0, 24, degrees))
+                        .lineToSplineHeading(new Pose2d(0, -24, 0))
+                        .build();
+                drive.followTrajectory(powershots);
             }
 
             if     (gamepad1.y)
