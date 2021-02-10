@@ -37,11 +37,12 @@ public class triangles extends LinearOpMode {
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
 
     private double goalCoordX = 81;
-    private double goalCoordy = -40.5;
+    private double goalCoordy = 40.5;
 
     private double robotCoordX = 0;
     private double robotCoordY = 0;
     private double currentRotation = 0;
+    private double robotAngle = 0;
 
 
     public Servo wobbleArm;
@@ -107,7 +108,7 @@ public class triangles extends LinearOpMode {
                 //calculate triangle things
                 double opp = Math.sqrt(Math.pow(goalCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2)); //goalCoordX - robotCoordX;
                 double adj = Math.sqrt(Math.pow(robotCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2));
-                double robotAngle = opp / adj;
+                robotAngle = opp / adj;
                 drive.turn(Math.toRadians((currentRotation + (-90 - currentRotation)) + robotAngle));
                 robot.shooter.setShooterPower(.7);
                 robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
@@ -167,6 +168,9 @@ public class triangles extends LinearOpMode {
                 wobbleArm.setPosition(0);
             }
             telemetry.addData("Shooter velocity: ",robot.shooter.getShooterVelocity());
+            telemetry.addData("current rotation: ", currentRotation);
+            telemetry.addData("turn angles: ", (currentRotation + (-90 - currentRotation)) + robotAngle);
+            telemetry.addData("robot angle: ", robotAngle);
             telemetry.update();
         }
 
