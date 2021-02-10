@@ -169,7 +169,7 @@ public class testTele extends LinearOpMode {
             }
 
             if (gamepad1.y) {
-                wobbleArm.setPosition(.4);
+                wobbleArm.setPosition(.6);
                 sleep(200);
                 wobbleClaw.setPosition(.45);
             } else if (gamepad1.b) {
