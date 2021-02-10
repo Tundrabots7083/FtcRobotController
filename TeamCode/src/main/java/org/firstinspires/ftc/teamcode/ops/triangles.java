@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.ops;
 
 import android.net.wifi.hotspot2.omadm.PpsMoParser;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -22,6 +21,29 @@ import org.firstinspires.ftc.teamcode.components.Shooter;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 //import org.firstinspires.ftc.teamcode.geometry.Vector2d;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+//import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.bots.TestBot;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
+
 
 
 @TeleOp(name="triangle stuff", group="ops")
@@ -37,7 +59,7 @@ public class triangles extends LinearOpMode {
     private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
 
     private double goalCoordX = 81;
-    private double goalCoordy = 40.5;
+    private double goalCoordy = -40.5;
 
     private double robotCoordX = 0;
     private double robotCoordY = 0;
@@ -82,9 +104,9 @@ public class triangles extends LinearOpMode {
 
         while (opModeIsActive()) {
             Pose2d position = drive.getPoseEstimate();
-            robotCoordX = (double)position.getX();
-            robotCoordY = (double)position.getY();
-            currentRotation = (double)position.getHeading();
+            robotCoordX = position.getX();
+            robotCoordY = position.getY();
+            currentRotation = position.getHeading();
 
             //field oriented gamepad stuff
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
@@ -146,11 +168,14 @@ public class triangles extends LinearOpMode {
                 if ((Math.abs(currentRotation)) >= 180) {
                     degrees = (double)(360 - currentRotation);
                 } else {
-                    degrees = (double)(currentRotation - 180);
+                    degrees = (double) (currentRotation - 180);
                 }
-                Trajectory powershots = drive.trajectoryBuilder(position)
-                        .lineToSplineHeading(new Pose2d(0, 24, degrees))
-                        .lineToSplineHeading(new Pose2d(0, -24, 0))
+                //update pose
+                Pose2d hello = drive.getPoseEstimate();
+
+                //line up for shot
+                Trajectory powershots = drive.trajectoryBuilder(hello)
+                        .lineToLinearHeading(new Pose2d(0, -24, 0))
                         .build();
                 drive.followTrajectory(powershots);
             }
@@ -167,10 +192,13 @@ public class triangles extends LinearOpMode {
                 sleep(200);
                 wobbleArm.setPosition(0);
             }
+
             telemetry.addData("Shooter velocity: ",robot.shooter.getShooterVelocity());
             telemetry.addData("current rotation: ", currentRotation);
             telemetry.addData("turn angles: ", (currentRotation + (-90 - currentRotation)) + robotAngle);
             telemetry.addData("robot angle: ", robotAngle);
+            telemetry.addData("x: ", robotCoordX);
+            telemetry.addData("y: ", robotCoordY);
             telemetry.update();
         }
 
