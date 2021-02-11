@@ -107,6 +107,8 @@ public class triangles extends LinearOpMode {
             robotCoordX = position.getX();
             robotCoordY = position.getY();
             currentRotation = position.getHeading();
+            telemetry.addData("x: ", robotCoordX);
+            telemetry.addData("y: ", robotCoordY);
 
             //field oriented gamepad stuff
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
@@ -197,8 +199,6 @@ public class triangles extends LinearOpMode {
             telemetry.addData("current rotation: ", currentRotation);
             telemetry.addData("turn angles: ", (currentRotation + (-90 - currentRotation)) + robotAngle);
             telemetry.addData("robot angle: ", robotAngle);
-            telemetry.addData("x: ", robotCoordX);
-            telemetry.addData("y: ", robotCoordY);
             telemetry.update();
         }
 
