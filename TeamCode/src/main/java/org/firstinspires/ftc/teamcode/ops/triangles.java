@@ -75,6 +75,7 @@ public class triangles extends LinearOpMode {
 
     private int xPassThrough = 0;
     private int yPassThrough = 0;
+    private double robotAngle = 0;
 
 
     public Servo wobbleArm;
@@ -118,9 +119,20 @@ public class triangles extends LinearOpMode {
             robotCoordY = (double)position.getY();
             currentHeading = (double)position.getHeading(); // Gets the robot's orientation in radians
             currentRotation = (double)((currentHeading * 180)/Math.PI); // Converts the robots orientation from Radians to Degrees
+
+
+
             //field oriented gamepad stuff
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
+
+            telemetry.addData("Shooter velocity: ",robot.shooter.getShooterVelocity());
+            telemetry.addData("current rotation: ", currentRotation);
+            telemetry.addData("turn angles: ", (currentRotation + (-90 - currentRotation)) + robotAngle);
+            telemetry.addData("robot angle: ", robotAngle);
+            telemetry.update();
+
+            
             //sketchy intake code idk if work
             if (gamepad1.right_trigger > .1) {
                 robot.loader.indexer.setPosition(.71);
@@ -161,7 +173,6 @@ public class triangles extends LinearOpMode {
                 double shootDegrees = degrees/180; // Converts the degrees into decimal so it can be used in the Shooter Servos
 
                 robot.shooter.ShootAngle.setPosition(shootDegrees);
-
 
                 robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
                 robot.loader.indexer.setPosition(1);*/
@@ -219,11 +230,7 @@ public class triangles extends LinearOpMode {
                 wobbleArm.setPosition(0);
             }
 
-            telemetry.addData("Shooter velocity: ",robot.shooter.getShooterVelocity());
-            telemetry.addData("current rotation: ", currentRotation);
-            telemetry.addData("turn angles: ", (currentRotation + (-90 - currentRotation)) + robotAngle);
-            telemetry.addData("robot angle: ", robotAngle);
-            telemetry.update();
+
         }
 
 
