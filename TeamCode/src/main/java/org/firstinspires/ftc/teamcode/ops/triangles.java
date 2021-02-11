@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.ops;
 
 import android.net.wifi.hotspot2.omadm.PpsMoParser;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -20,7 +19,31 @@ import org.firstinspires.ftc.teamcode.components.Intake;
 import org.firstinspires.ftc.teamcode.components.Loader;
 import org.firstinspires.ftc.teamcode.components.Shooter;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.opencv.core.Mat;
 //import org.firstinspires.ftc.teamcode.geometry.Vector2d;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+//import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.bots.TestBot;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 
 
 
@@ -42,6 +65,16 @@ public class triangles extends LinearOpMode {
     private double robotCoordX = 0;
     private double robotCoordY = 0;
     private double currentRotation = 0;
+    private double currentHeading = 0;
+
+    private double ringThreeHeighIn = 0;
+    private double aValue = -0.05;
+
+    private double shotVertexX = 0;
+    private double shotVertexY = ringThreeHeighIn;
+
+    private int xPassThrough = 0;
+    private int yPassThrough = 0;
 
 
     public Servo wobbleArm;
@@ -83,8 +116,8 @@ public class triangles extends LinearOpMode {
             Pose2d position = drive.getPoseEstimate();
             robotCoordX = (double)position.getX();
             robotCoordY = (double)position.getY();
-            currentRotation = (double)position.getHeading();
-
+            currentHeading = (double)position.getHeading(); // Gets the robot's orientation in radians
+            currentRotation = (double)((currentHeading * 180)/Math.PI); // Converts the robots orientation from Radians to Degrees
             //field oriented gamepad stuff
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
@@ -104,14 +137,34 @@ public class triangles extends LinearOpMode {
 
             if (gamepad1.left_bumper)
             {
-                //calculate triangle things
+                //calculate triangle things for aim
                 double opp = Math.sqrt(Math.pow(goalCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2)); //goalCoordX - robotCoordX;
                 double adj = Math.sqrt(Math.pow(robotCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2));
-                double robotAngle = opp / adj;
-                drive.turn(Math.toRadians((currentRotation + (-90 - currentRotation)) + robotAngle));
-                robot.shooter.setShooterPower(.7);
+                double hypo = Math.sqrt(Math.pow(adj, 2) + Math.pow(opp, 2)); // We get the hypotenuse of the aim triangle so that we can use it as the adjacent for the shooting triangle
+                double aimAngle = Math.atan(opp / adj);
+                //double aimDegrees = (currentRotation + (-90 - currentRotation)) + robotAngle;
+                drive.turn(Math.toRadians(aimAngle));
+
+
+                // ------------- BELOW IS TRIANGLE SHOOTER STUFF, DO NOT DELETE ------------- //
+
+                //Vector2d Vector = new Vector2d(adj, opp);
+
+                //aValue = (yPassThrough - shotVertexY) / ((xPassThrough * xPassThrough) - ((shotVertexX + shotVertexX) * xPassThrough) + (shotVertexX * shotVertexX));
+
+                /*shotVertexX = hypo;
+                //Vector2d shotVector = new Vector2d(shotVertexX, shotVertexY);
+                //Vector2d shotParabolaFocus = new Vector2d(shotVertexX, shotVertexY + (14 * aValue));
+
+                double degrees = Math.atan(shotVertexY / shotVertexX);
+
+                double shootDegrees = degrees/180; // Converts the degrees into decimal so it can be used in the Shooter Servos
+
+                robot.shooter.ShootAngle.setPosition(shootDegrees);
+
+
                 robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-                robot.loader.indexer.setPosition(1);
+                robot.loader.indexer.setPosition(1);*/
             }
             else
             {
@@ -141,20 +194,19 @@ public class triangles extends LinearOpMode {
             }
 
             if (gamepad1.dpad_right) {
-                double degrees = 0;
+                /*double degrees = 0;
                 if ((Math.abs(currentRotation)) >= 180) {
                     degrees = (double)(360 - currentRotation);
                 } else {
                     degrees = (double)(currentRotation - 180);
-                }
-                Trajectory powershots = drive.trajectoryBuilder(position)
-                        .lineToSplineHeading(new Pose2d(0, 24, degrees))
-                        .lineToSplineHeading(new Pose2d(0, -24, 0))
+                }*/
+                Trajectory powershots = drive.trajectoryBuilder(new Pose2d(0,24,0))
+                        .lineToLinearHeading(new Pose2d(0, -24, 0))
                         .build();
                 drive.followTrajectory(powershots);
             }
 
-            if     (gamepad1.y)
+            if (gamepad1.y)
             {
                 wobbleArm.setPosition(.4);
                 sleep(200);
@@ -166,7 +218,11 @@ public class triangles extends LinearOpMode {
                 sleep(200);
                 wobbleArm.setPosition(0);
             }
+
             telemetry.addData("Shooter velocity: ",robot.shooter.getShooterVelocity());
+            telemetry.addData("current rotation: ", currentRotation);
+            telemetry.addData("turn angles: ", (currentRotation + (-90 - currentRotation)) + robotAngle);
+            telemetry.addData("robot angle: ", robotAngle);
             telemetry.update();
         }
 
