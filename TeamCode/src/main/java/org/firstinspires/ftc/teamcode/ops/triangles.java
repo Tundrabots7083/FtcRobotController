@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.IncludedFirmwareFileInfo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.components.DriveTrain;
 import org.firstinspires.ftc.teamcode.components.Intake;
@@ -67,7 +68,7 @@ public class triangles extends LinearOpMode {
     private double currentRotation = 0;
     private double currentHeading = 0;
 
-    private double ringThreeHeighIn = 0;
+    private double ringThreeHeighIn = 37;
     private double aValue = -0.05;
 
     private double shotVertexX = 0;
@@ -76,6 +77,11 @@ public class triangles extends LinearOpMode {
     private int xPassThrough = 0;
     private int yPassThrough = 0;
     private double robotAngle = 0;
+
+    private double opp = 0;
+    private double adj = 0;
+    private double hypo = 0;
+
 
 
     public Servo wobbleArm;
@@ -146,16 +152,17 @@ public class triangles extends LinearOpMode {
             {
                 robot.intake.setIntakePower(0);
             }
-
-            if (gamepad1.left_bumper)
-            {
+            if(gamepad1.dpad_left){
                 //calculate triangle things for aim
-                double opp = Math.sqrt(Math.pow(goalCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2)); //goalCoordX - robotCoordX;
-                double adj = Math.sqrt(Math.pow(robotCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2));
-                double hypo = Math.sqrt(Math.pow(adj, 2) + Math.pow(opp, 2)); // We get the hypotenuse of the aim triangle so that we can use it as the adjacent for the shooting triangle
+                opp = Math.sqrt(Math.pow(goalCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2)); //goalCoordX - robotCoordX;
+                adj = Math.sqrt(Math.pow(robotCoordX - robotCoordX, 2) + Math.pow(goalCoordy - robotCoordY, 2));
+                hypo = Math.sqrt(Math.pow(adj, 2) + Math.pow(opp, 2)); // We get the hypotenuse of the aim triangle so that we can use it as the adjacent for the shooting triangle
                 double aimAngle = Math.atan(opp / adj);
                 //double aimDegrees = (currentRotation + (-90 - currentRotation)) + robotAngle;
                 drive.turn(Math.toRadians(aimAngle));
+            }
+            if (gamepad1.left_bumper)
+            {
 
 
                 // ------------- BELOW IS TRIANGLE SHOOTER STUFF, DO NOT DELETE ------------- //
@@ -164,18 +171,21 @@ public class triangles extends LinearOpMode {
 
                 //aValue = (yPassThrough - shotVertexY) / ((xPassThrough * xPassThrough) - ((shotVertexX + shotVertexX) * xPassThrough) + (shotVertexX * shotVertexX));
 
-                /*shotVertexX = hypo;
+                shotVertexX = hypo;
                 //Vector2d shotVector = new Vector2d(shotVertexX, shotVertexY);
                 //Vector2d shotParabolaFocus = new Vector2d(shotVertexX, shotVertexY + (14 * aValue));
+                //double tanTest = 300.0/400.0;
+                double degrees = (double)Math.atan(shotVertexY/shotVertexX);
+                double shootDegrees = degrees + 0.5; // Converts the degrees into decimal so it can be used in the Shooter Servos
+                telemetry.addData("hypo: ", hypo);
+                telemetry.addData("shotAngleDegrees: ", degrees);
+                telemetry.addData("shotAngleDecimal: ", shootDegrees);
 
-                double degrees = Math.atan(shotVertexY / shotVertexX);
-
-                double shootDegrees = degrees/180; // Converts the degrees into decimal so it can be used in the Shooter Servos
 
                 robot.shooter.ShootAngle.setPosition(shootDegrees);
 
                 robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-                robot.loader.indexer.setPosition(1);*/
+                robot.loader.indexer.setPosition(1);
             }
             else
             {
