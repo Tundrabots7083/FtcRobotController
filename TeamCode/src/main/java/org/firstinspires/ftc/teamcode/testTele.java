@@ -17,10 +17,10 @@ import org.firstinspires.ftc.teamcode.components.DriveTrain;
 
 @TeleOp
 public class testTele extends LinearOpMode {
-    // Copy your PID Coefficients here
+    //shooter PID values
     public static PIDCoefficients MOTOR_VELO_PID = new PIDCoefficients(0.0016, 0, 0.0000016);
 
-    // Copy your feedforward gains here
+    //shooter feedforward values
     public static double kV = 0.000435 / TuningController.rpmToTicksPerSecond(TuningController.MOTOR_MAX_RPM);
     public static double kA = 0.00015;
     public static double kStatic = 0;
@@ -30,31 +30,25 @@ public class testTele extends LinearOpMode {
     private final ElapsedTime veloTimer = new ElapsedTime();
     private double lastTargetVelo = 0.0;
 
-    // Our velocity controller
+    //velocity controller
     private final VelocityPIDFController veloController = new VelocityPIDFController(MOTOR_VELO_PID, kV, kA, kStatic);
 
-    //other stuff idk
+    //telemetry
     private ElapsedTime runtime = new ElapsedTime();
     private TestBot robot = null;
     private boolean logEnableTrace = false;
     private boolean logToTelemetry = true;
 
-    //servos
+    //servo init
     public Servo wobbleArm;
     public Servo wobbleClaw;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        // SETUP MOTORS //
-        // Change my id
+        //shooter motor setup
         DcMotorEx myMotor1 = hardwareMap.get(DcMotorEx.class, "shooterOne");
         DcMotorEx myMotor2 = hardwareMap.get(DcMotorEx.class, "shooterTwo");
 
-        // Reverse as appropriate
-        //myMotor1.setDirection(DcMotor.Direction.REVERSE);
-        // myMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // Ensure that RUN_USING_ENCODER is not set
         myMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         myMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -63,9 +57,7 @@ public class testTele extends LinearOpMode {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        // Insert whatever other initialization stuff you do here
-
-        //tundra
+        //tele init
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
         robot.logger.logInfo("runOpMode", "===== [ Start Initializing ]");
 
@@ -76,11 +68,11 @@ public class testTele extends LinearOpMode {
 
         wobbleClaw = hardwareMap.get(Servo.class, "wobbleClaw");
         wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
-        //tundra
+
 
         waitForStart();
 
-        //tundra
+        //hardware map init
         robot.shooter.init();
         robot.loader.init();
         robot.intake.init();
@@ -90,9 +82,10 @@ public class testTele extends LinearOpMode {
         robot.logger.logInfo("runOpMode", "===== [ Start TeleOp ]");
         runtime.reset();
 
+        //init servo positions
         wobbleArm.setPosition(.2);
         robot.shooter.ShootAngle.setPosition(.85);
-        //tundra
+
 
         if (isStopRequested()) return;
 
@@ -101,7 +94,6 @@ public class testTele extends LinearOpMode {
 
         while (!isStopRequested()) {
             ///// Run the velocity controller ////
-
             // Target velocity in ticks per second
 
             double SHOOTER_RPM = 4525;
@@ -154,7 +146,7 @@ public class testTele extends LinearOpMode {
 
             if (gamepad1.right_bumper) {
                 //change values
-                robot.loader.loaderServo.setPosition(.5);
+                robot.loader.loaderServo.setPosition(.7);
             } else {
                 //change value
                 robot.loader.loaderServo.setPosition(.83);
@@ -177,10 +169,8 @@ public class testTele extends LinearOpMode {
                 sleep(200);
                 wobbleArm.setPosition(0);
             }
-            // telemetry.addData("Shooter velocity: ",robot.shooter.getShooterVelocity());
-            //telemetry.update();
-        }
 
+        }
 
     }
 
@@ -249,6 +239,7 @@ public class testTele extends LinearOpMode {
 
         double speed = 1;
 
+        //slow button
         if (gamepad1.left_bumper) {
             speed = .4;
 
@@ -277,4 +268,3 @@ public class testTele extends LinearOpMode {
 
 
 }
-
