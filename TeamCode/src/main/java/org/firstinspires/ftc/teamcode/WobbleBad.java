@@ -89,8 +89,9 @@ public class WobbleBad extends LinearOpMode {
 
         // Start the veloTimer
         veloTimer.reset();
-
+        ElapsedTime loopTimer = new ElapsedTime();
         while (!isStopRequested()) {
+            loopTimer.reset();
             ///// Run the velocity controller ////
             // Target velocity in ticks per second
 
@@ -163,6 +164,9 @@ public class WobbleBad extends LinearOpMode {
                 wobbleArm.setPosition(0);
             }
 
+
+            telemetry.addData("LOOP TIME MS: ",loopTimer.milliseconds());
+            telemetry.update();
         }
 
     }
