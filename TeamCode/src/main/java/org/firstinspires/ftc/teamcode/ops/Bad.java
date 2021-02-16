@@ -75,8 +75,11 @@ public class Bad extends LinearOpMode {
     double power;
     double targetVelo;
 
+
+
     @Override
     public void runOpMode() throws InterruptedException {
+        // roadrunner pogg
 
         //PID motor setup
         myMotor1 = hardwareMap.get(DcMotorEx.class, "shooterOne");

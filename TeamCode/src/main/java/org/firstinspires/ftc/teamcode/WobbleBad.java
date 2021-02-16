@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,6 +13,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.components.DriveTrain;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 @TeleOp
 public class WobbleBad extends LinearOpMode {
@@ -54,8 +56,10 @@ public class WobbleBad extends LinearOpMode {
     private double lastBlPower = 1000000;
     private double lastBrPower = 1000000;
 
+    private Pose2d robotPosition = new Pose2d(0,0,0);
     @Override
     public void runOpMode() throws InterruptedException {
+
         //shooter motor setup
         myMotor1 = hardwareMap.get(DcMotorEx.class, "shooterOne");
         myMotor2 = hardwareMap.get(DcMotorEx.class, "shooterTwo");
@@ -79,6 +83,7 @@ public class WobbleBad extends LinearOpMode {
 
         wobbleClaw = hardwareMap.get(Servo.class, "wobbleClaw");
         wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
 
         waitForStart();
@@ -104,6 +109,10 @@ public class WobbleBad extends LinearOpMode {
         ElapsedTime loopTimer = new ElapsedTime();
         while (!isStopRequested()) {
             loopTimer.reset();
+
+
+            drive.updatePoseEstimate();
+            robotPosition = drive.getPoseEstimate();
             ///// Run the velocity controller ////
             // Target velocity in ticks per second
 
@@ -175,6 +184,10 @@ public class WobbleBad extends LinearOpMode {
 
 
             telemetry.addData("LOOP TIME MS: ",loopTimer.milliseconds());
+            telemetry.addData("x pos estimate",robotPosition.getX());
+            telemetry.addData("y pos estimate",robotPosition.getY());
+            telemetry.addData("heading RAD estimate",robotPosition.getHeading());
+            telemetry.addData("heading DEG estimate",Math.toDegrees(robotPosition.getHeading()));
             telemetry.update();
         }
 
@@ -189,7 +202,7 @@ public class WobbleBad extends LinearOpMode {
      **/
 
     public void FieldRelative(double ySpeed, double xSpeed, double turnSpeed) {
-        double angle = (robot.gyroNavigator.getAngleGood()) + (-90);
+        double angle = roadrunnerAngleToFieldOrientedUsableAngle(robotPosition.getHeading()) + 90;//(robot.gyroNavigator.getAngleGood()) + (-90);
         angle = AngleWrapDeg(angle);
         angle = -angle;
 
@@ -343,5 +356,20 @@ public class WobbleBad extends LinearOpMode {
         lastBrPower = br;
     }
 
+
+    /**
+     * convert angle from roadrunner to usable field relative angle
+     * @return
+     */
+    public double roadrunnerAngleToFieldOrientedUsableAngle(double roadrunnerAngle) {
+        double angleDeg = Math.toDegrees(roadrunnerAngle);
+        if (angleDeg >= 180 && angleDeg <= 360) {
+            angleDeg = 360 - angleDeg;
+        } else {
+            angleDeg = -angleDeg;
+        }
+
+        return angleDeg;
+    }
 
 }
