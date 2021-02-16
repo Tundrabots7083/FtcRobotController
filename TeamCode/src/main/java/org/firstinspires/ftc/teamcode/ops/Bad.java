@@ -30,8 +30,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-@Autonomous(name = "bad", group = "ops")
-public class bad extends LinearOpMode {
+@Autonomous(name = "Bad", group = "ops")
+public class Bad extends LinearOpMode {
     //Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private TestBot robot = null;
@@ -41,7 +41,6 @@ public class bad extends LinearOpMode {
     OpenCvCamera webcam;
     SkystoneDeterminationPipeline pipeline;
 
-    //shooter pid nonsense
     // Copy your PID Coefficients here
     public static PIDCoefficients MOTOR_VELO_PID = new PIDCoefficients(0.0016, 0, 0.0000016);
 
@@ -50,24 +49,12 @@ public class bad extends LinearOpMode {
     public static double kA = 0.00015;
     public static double kStatic = 0;
 
-    // Timer for calculating desired acceleration
-    // Necessary for kA to have an affect
+    // Timer for calculating desired acceleration - necessary for kA to have an affect
     private final ElapsedTime veloTimer = new ElapsedTime();
     private double lastTargetVelo = 0.0;
 
     // Our velocity controller
     private final VelocityPIDFController veloController = new VelocityPIDFController(MOTOR_VELO_PID, kV, kA, kStatic);
-
-    //end of pid stuff idk
-
-    //shooter
-   /*
-    private double SHOOTER_RPM = 6000;
-    private double TICKS_PER_ROTATION = 14;
-    private double FLYWHEEL_VELOCITY = (SHOOTER_RPM * TICKS_PER_ROTATION) / 60;
-
-   */
-    //I THINK I CAN COMMENT THIS STUFF OUT BECAUSE ITS DOWN THERE SOMEWHERE IDK
 
     //motors
     public DcMotor intake = null;
@@ -91,15 +78,9 @@ public class bad extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        //morepid
-        // SETUP MOTORS //
-        // Change my id
+        //PID motor setup
         myMotor1 = hardwareMap.get(DcMotorEx.class, "shooterOne");
         myMotor2 = hardwareMap.get(DcMotorEx.class, "shooterTwo");
-
-        // Reverse as appropriate
-        //myMotor1.setDirection(DcMotor.Direction.REVERSE);
-        // myMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Ensure that RUN_USING_ENCODER is not set
         myMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -109,8 +90,6 @@ public class bad extends LinearOpMode {
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-        //more pid
-
 
         wobbleClaw = hardwareMap.get(Servo.class, "wobbleClaw");
         wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
@@ -149,24 +128,19 @@ public class bad extends LinearOpMode {
         robot.shooter.init();
         robot.loader.init();
 
-
-        // uncomment while loop to tweak camera comment for robot to sense then do drive paths
-            /*while (opModeIsActive())
+        /**
+         * Camera Calibration
+         * uncomment while loop to tweak camera comment for robot to sense then do drive paths
+         */
+        /* while (opModeIsActive())
             {
             telemetry.addData("Analysis", pipeline.getAnalysis());
             telemetry.addData("Position",pipeline.position);
             telemetry.update();
             sleep(50);
-            }*/
+            }
         //sleeps for camera to have time to sense tweak to whatever is good
-        sleep(1000);
-
-        //PID STUFF AAAAA
-
-
-        ///// Run the velocity controller ////
-
-        // Target velocity in ticks per second
+        sleep(1000); */
 
         double SHOOTER_RPM = 4750;
         double TICKS_PER_ROTATION = 28 * (3 / 2);
@@ -177,7 +151,6 @@ public class bad extends LinearOpMode {
         veloController.setTargetVelocity(targetVelo);
         veloController.setTargetAcceleration((targetVelo - lastTargetVelo) / veloTimer.seconds());
         veloTimer.reset();
-
         lastTargetVelo = targetVelo;
 
         // Get the velocity from the motor with the encoder
@@ -187,10 +160,8 @@ public class bad extends LinearOpMode {
         // Update the controller and set the power for each motor
         double power = veloController.update(motorPos, motorVelo);
 
-        //PID STUFF AAAAAAAAAAAA IDK WHAT IM DOING
-
-
 //------------------------------Drive-Paths-Below-------------------------------------------------\\
+
         telemetry.addData("Analysis", pipeline.getAnalysis());
         telemetry.addData("Position", pipeline.position);
         telemetry.update();
@@ -278,17 +249,6 @@ public class bad extends LinearOpMode {
                     .build();
 
             drive.followTrajectory(move69);
-
-
-
-            /*
-            //park on da line
-            Trajectory move8 = drive.trajectoryBuilder(move7.end())
-                    .splineToLinearHeading(new Pose2d(10, -30, 0), 0)
-                    .build();
-
-            drive.followTrajectory(move8);
-             */
 
         } else if (pipeline.getAnalysis() > pipeline.ONE_RING_THRESHOLD) {
             //1 ring
@@ -557,41 +517,6 @@ public class bad extends LinearOpMode {
     }
 
     /**
-     * shooting method that doesn't work yet
-     *
-     * @param Shots
-     * @param ShooterAngle
-     */
-   /* public void bad(double Shots, double ShooterAngle) {
-        //flywheel on
-        robot.shooter.setShooterVelocity(FLYWHEEL_VELOCITY);
-        //shooter angle
-        robot.shooter.ShootAngle.setPosition(ShooterAngle);
-        //indexer up
-        robot.loader.indexer.setPosition(INDEXER_UP);
-        //wait for shooter to get to speed
-        while (robot.shooter.getShooterVelocity() > FLYWHEEL_VELOCITY - 5) {
-
-            // do nothing and wait
-
-        }
-        //load rings
-        for (double i = 0; i < Shots; i++) {
-            robot.loader.loaderServo.setPosition(.83);
-            sleep(LOADER_TIME);
-            robot.loader.loaderServo.setPosition(.5);
-            sleep(LOADER_TIME);
-        }
-        //loader arm in position
-        robot.loader.loaderServo.setPosition(.83);
-        //flywheel off
-        robot.shooter.setShooterVelocity(0);
-        //indexer down
-        robot.loader.indexer.setPosition(INDEXER_DOWN);
-    }
-*/
-
-    /**
      * ReleaseWobble
      */
     public void ReleaseWobble() {
@@ -728,7 +653,6 @@ public class bad extends LinearOpMode {
 
     }
 
-
     /**
      * enum states for pidShooter
      */
@@ -738,7 +662,6 @@ public class bad extends LinearOpMode {
         SHOOT,
         RETRACT,
     }
-
 
 }
 

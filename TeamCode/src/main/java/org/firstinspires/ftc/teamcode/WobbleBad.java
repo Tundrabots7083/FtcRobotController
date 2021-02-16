@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.bots.TestBot;
 import org.firstinspires.ftc.teamcode.components.DriveTrain;
 
 @TeleOp
-public class testTele extends LinearOpMode {
+public class WobbleBad extends LinearOpMode {
     //shooter PID values
     public static PIDCoefficients MOTOR_VELO_PID = new PIDCoefficients(0.0016, 0, 0.0000016);
 
@@ -25,8 +25,7 @@ public class testTele extends LinearOpMode {
     public static double kA = 0.00015;
     public static double kStatic = 0;
 
-    // Timer for calculating desired acceleration
-    // Necessary for kA to have an affect
+    // Timer for calculating desired acceleration - Necessary for kA to have an affect
     private final ElapsedTime veloTimer = new ElapsedTime();
     private double lastTargetVelo = 0.0;
 
@@ -78,7 +77,6 @@ public class testTele extends LinearOpMode {
         robot.intake.init();
         robot.driveTrain.init(DriveTrain.InitType.INIT_4WD);
         robot.gyroNavigator.init();
-
         robot.logger.logInfo("runOpMode", "===== [ Start TeleOp ]");
         runtime.reset();
 
@@ -105,7 +103,6 @@ public class testTele extends LinearOpMode {
             veloController.setTargetVelocity(targetVelo);
             veloController.setTargetAcceleration((targetVelo - lastTargetVelo) / veloTimer.seconds());
             veloTimer.reset();
-
             lastTargetVelo = targetVelo;
 
             // Get the velocity from the motor with the encoder
@@ -114,15 +111,11 @@ public class testTele extends LinearOpMode {
 
             // Update the controller and set the power for each motor
             double power = veloController.update(motorPos, motorVelo);
-//            myMotor1.setPower(power);
-            //          myMotor2.setPower(power);
-
-            // Do your opmode stuff
 
             //field oriented gamepad stuff
             FieldRelative(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
-            //sketchy intake code idk if work
+            //intake
             if (gamepad1.right_trigger > .1) {
                 robot.loader.indexer.setPosition(.71);
                 robot.intake.setIntakePower(1);
@@ -138,17 +131,15 @@ public class testTele extends LinearOpMode {
                 myMotor2.setPower(power);
                 robot.loader.indexer.setPosition(1);
             } else {
-
                 myMotor1.setPower(0);
                 myMotor2.setPower(0);
-
             }
 
             if (gamepad1.right_bumper) {
-                //change values
+                //in
                 robot.loader.loaderServo.setPosition(.67);
             } else {
-                //change value
+                //out
                 robot.loader.loaderServo.setPosition(.83);
             }
 
@@ -161,10 +152,12 @@ public class testTele extends LinearOpMode {
             }
 
             if (gamepad1.y) {
+                //wobble arm down
                 wobbleArm.setPosition(.4);
                 sleep(200);
                 wobbleClaw.setPosition(.45);
             } else if (gamepad1.b) {
+                //wobble arm up
                 wobbleClaw.setPosition(0.15);
                 sleep(200);
                 wobbleArm.setPosition(0);
