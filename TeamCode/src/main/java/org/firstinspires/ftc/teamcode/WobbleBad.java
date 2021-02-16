@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
-import com.acmerobotics.roadrunner.control.PIDFController;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -31,7 +29,9 @@ public class WobbleBad extends LinearOpMode {
 
     //velocity controller
     private final VelocityPIDFController veloController = new VelocityPIDFController(MOTOR_VELO_PID, kV, kA, kStatic);
-
+    // access motors from anywhere in the class
+    private DcMotorEx myMotor1;
+    private DcMotorEx myMotor2;
     //telemetry
     private ElapsedTime runtime = new ElapsedTime();
     private TestBot robot = null;
@@ -42,11 +42,23 @@ public class WobbleBad extends LinearOpMode {
     public Servo wobbleArm;
     public Servo wobbleClaw;
 
+
+    // last set powers / positions for lynx optimization, set to big dumb number so things dont break
+    private double lastIntakePower = 10000000;
+    private double lastShooterPower = 10000000;
+    private double lastIndexerPosition = 10000000;
+    private double lastLoaderPosition = 10000000;
+    private double lastShootAnglePosition = 1000000;
+    private double lastFlPower = 1000000;
+    private double lastFrPower = 1000000;
+    private double lastBlPower = 1000000;
+    private double lastBrPower = 1000000;
+
     @Override
     public void runOpMode() throws InterruptedException {
         //shooter motor setup
-        DcMotorEx myMotor1 = hardwareMap.get(DcMotorEx.class, "shooterOne");
-        DcMotorEx myMotor2 = hardwareMap.get(DcMotorEx.class, "shooterTwo");
+        myMotor1 = hardwareMap.get(DcMotorEx.class, "shooterOne");
+        myMotor2 = hardwareMap.get(DcMotorEx.class, "shooterTwo");
 
         myMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         myMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -118,38 +130,35 @@ public class WobbleBad extends LinearOpMode {
 
             //intake
             if (gamepad1.right_trigger > .1) {
-                robot.loader.indexer.setPosition(.71);
-                robot.intake.setIntakePower(1);
+                setIndexerPositionLynxOptmized(.71);
+                setIntakePowerLynxOptimized(1);
             } else if (gamepad1.left_trigger > .1) {
-                robot.intake.setIntakePower(-1);
+                setIntakePowerLynxOptimized(-1);
             } else {
-                robot.intake.setIntakePower(0);
+                setIntakePowerLynxOptimized(0);
             }
 
             if (gamepad1.left_bumper) {
-                //robot.shooter.setShooterPower(.7);
-                myMotor1.setPower(power);
-                myMotor2.setPower(power);
-                robot.loader.indexer.setPosition(1);
+                setShooterPowerLynxOptimized(power);
+                setIndexerPositionLynxOptmized(1);
             } else {
-                myMotor1.setPower(0);
-                myMotor2.setPower(0);
+                setShooterPowerLynxOptimized(0);
             }
 
             if (gamepad1.right_bumper) {
                 //in
-                robot.loader.loaderServo.setPosition(.67);
+                setLoaderPositionLynxOptmized(.67);
             } else {
                 //out
-                robot.loader.loaderServo.setPosition(.83);
+                setLoaderPositionLynxOptmized(.83);
             }
 
             if (gamepad1.dpad_down) {
                 //powershots
-                robot.shooter.ShootAngle.setPosition(.81);
+                setShootAnglePositionLynxOptimized(.81);
             } else if (gamepad1.dpad_up) {
                 //highgoal
-                robot.shooter.ShootAngle.setPosition(.84);
+                setShootAnglePositionLynxOptimized(.84);
             }
 
             if (gamepad1.y) {
@@ -246,10 +255,8 @@ public class WobbleBad extends LinearOpMode {
 
         }
 
-        robot.driveTrain.backLeftMotor.setPower(backLeftPower * speed);
-        robot.driveTrain.backRightMotor.setPower(backRightPower * speed);
-        robot.driveTrain.frontLeftMotor.setPower(frontLeftPower * speed);
-        robot.driveTrain.frontRightMotor.setPower(frontRightPower * speed);
+        setDrivePowerLynxOptmized(frontLeftPower * speed,frontRightPower * speed,
+                backLeftPower * speed,backRightPower * speed);
 
     }
 
@@ -261,6 +268,79 @@ public class WobbleBad extends LinearOpMode {
             degrees -= 2.0 * 180;
         }
         return degrees;
+    }
+
+
+    /**
+     * set power of the intake while optimizing lynx writes
+     * @param power
+     */
+    public void setIntakePowerLynxOptimized(double power) {
+        if (power != lastIntakePower) {
+            robot.intake.setIntakePower(power);
+        }
+        lastIntakePower = power;
+    }
+
+    public void setShooterPowerLynxOptimized(double power) {
+        if (power != lastShooterPower) {
+            myMotor1.setPower(power);
+            myMotor2.setPower(power);
+        }
+        lastShooterPower = power;
+    }
+
+    public void setIndexerPositionLynxOptmized(double position) {
+        if (position != lastIndexerPosition) {
+            robot.loader.indexer.setPosition(position);
+        }
+        lastIndexerPosition = position;
+
+    }
+
+    public void setLoaderPositionLynxOptmized(double position) {
+        if (position != lastLoaderPosition) {
+            robot.loader.loaderServo.setPosition(position);
+        }
+        lastLoaderPosition = position;
+    }
+
+    public void setShootAnglePositionLynxOptimized(double position) {
+        if (position != lastShootAnglePosition) {
+            robot.shooter.ShootAngle.setPosition(position);
+        }
+        lastShootAnglePosition = position;
+
+    }
+
+    /**
+     * set drive train power lynx optmizied
+     * @param fl front left
+     * @param fr front right
+     * @param bl back left
+     * @param br back right
+     */
+    public void setDrivePowerLynxOptmized(double fl, double fr, double bl, double br) {
+        if (lastFlPower != fl) {
+            robot.driveTrain.backLeftMotor.setPower(fl);
+        }
+
+        if (lastFrPower != fr) {
+            robot.driveTrain.backRightMotor.setPower(fr);
+        }
+
+        if (lastBlPower != bl) {
+            robot.driveTrain.backLeftMotor.setPower(bl);
+        }
+
+        if (lastBrPower != br) {
+            robot.driveTrain.backRightMotor.setPower(br);
+        }
+
+        lastFrPower = fr;
+        lastFlPower = fl;
+        lastBlPower = bl;
+        lastBrPower = br;
     }
 
 
