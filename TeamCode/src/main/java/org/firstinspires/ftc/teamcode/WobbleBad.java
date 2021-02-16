@@ -322,11 +322,11 @@ public class WobbleBad extends LinearOpMode {
      */
     public void setDrivePowerLynxOptmized(double fl, double fr, double bl, double br) {
         if (lastFlPower != fl) {
-            robot.driveTrain.backLeftMotor.setPower(fl);
+            robot.driveTrain.frontLeftMotor.setPower(fl);
         }
 
         if (lastFrPower != fr) {
-            robot.driveTrain.backRightMotor.setPower(fr);
+            robot.driveTrain.frontRightMotor.setPower(fr);
         }
 
         if (lastBlPower != bl) {
