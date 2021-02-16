@@ -17,7 +17,7 @@ public class TestBot extends Bot {
     public Loader loader = null;
     public Shooter shooter = null;
 
-    /* Constructor */
+    // Constructor */
     public TestBot() {
 
     }
@@ -33,7 +33,7 @@ public class TestBot extends Bot {
         driveTrain = new DriveTrain(logger, aOpMode, "frontLeftMotor", "frontRightMotor",
                 "backLeftMotor", "backRightMotor",
                 gyroNavigator);
-        intake = new Intake(logger, aOpMode, "rightIntake");
+        intake = new Intake(logger, aOpMode, "rightIntake", "intakeTwo");
         loader = new Loader(logger, aOpMode, "loader", "indexer");
         shooter = new Shooter(logger, aOpMode, "shooterOne", "shooterTwo", "shooterAngle");
 

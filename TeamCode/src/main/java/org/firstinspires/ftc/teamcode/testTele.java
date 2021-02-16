@@ -84,7 +84,7 @@ public class testTele extends LinearOpMode {
 
         //init servo positions
         wobbleArm.setPosition(.2);
-        robot.shooter.ShootAngle.setPosition(.85);
+        robot.shooter.ShootAngle.setPosition(.84);
 
 
         if (isStopRequested()) return;
@@ -146,7 +146,7 @@ public class testTele extends LinearOpMode {
 
             if (gamepad1.right_bumper) {
                 //change values
-                robot.loader.loaderServo.setPosition(.7);
+                robot.loader.loaderServo.setPosition(.67);
             } else {
                 //change value
                 robot.loader.loaderServo.setPosition(.83);
@@ -157,7 +157,7 @@ public class testTele extends LinearOpMode {
                 robot.shooter.ShootAngle.setPosition(.81);
             } else if (gamepad1.dpad_up) {
                 //highgoal
-                robot.shooter.ShootAngle.setPosition(.85);
+                robot.shooter.ShootAngle.setPosition(.84);
             }
 
             if (gamepad1.y) {

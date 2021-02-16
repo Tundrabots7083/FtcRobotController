@@ -8,26 +8,25 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 //@Disabled
 public class Intake extends BotComponent {
     private String rightIntakeName;
+    private String leftIntakeName;
 
 
     public DcMotor Intake = null;
-
+    public DcMotor Intake2 = null;
 
 
     private boolean rightIntakeEnabled = true;
-
+    private boolean leftIntakeEnabled = true;
 
     public Intake(){
 
     }
 
     public Intake(Logger aLogger, OpMode aOpMode,
-                  String aRightIntakeName) {
-        super (aLogger, aOpMode);
+                  String aRightIntakeName, String aLeftIntakeName) {
+        super(aLogger, aOpMode);
         rightIntakeName = aRightIntakeName;
-
-
-
+        leftIntakeName = aLeftIntakeName;
 
     }
 
@@ -36,6 +35,7 @@ public class Intake extends BotComponent {
         //define and initialize motors
 
         Intake = initMotor(rightIntakeName, DcMotor.Direction.REVERSE);
+        Intake2 = initMotor(leftIntakeName, DcMotor.Direction.FORWARD);
 
 
         if (Intake != null) {
@@ -49,6 +49,7 @@ public class Intake extends BotComponent {
     public void setIntakePower (double power){
 
         Intake.setPower(power);
+        Intake2.setPower(power);
     }
 
 
