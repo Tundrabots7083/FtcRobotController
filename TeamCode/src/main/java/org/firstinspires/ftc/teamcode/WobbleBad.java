@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -183,12 +185,24 @@ public class WobbleBad extends LinearOpMode {
             }
 
 
-            telemetry.addData("LOOP TIME MS: ",loopTimer.milliseconds());
-            telemetry.addData("x pos estimate",robotPosition.getX());
-            telemetry.addData("y pos estimate",robotPosition.getY());
-            telemetry.addData("heading RAD estimate",robotPosition.getHeading());
-            telemetry.addData("heading DEG estimate",Math.toDegrees(robotPosition.getHeading()));
+            telemetry.addData("LOOP TIME MS: ", loopTimer.milliseconds());
+            telemetry.addData("x pos estimate", robotPosition.getX());
+            telemetry.addData("y pos estimate", robotPosition.getY());
+            telemetry.addData("heading RAD estimate", robotPosition.getHeading());
+            telemetry.addData("heading DEG estimate", Math.toDegrees(robotPosition.getHeading()));
             telemetry.update();
+
+            //automated powershots
+            if (gamepad1.dpad_left) {
+                Trajectory move1 = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .splineTo(new Vector2d(-38, -38), 0)
+                        .build();
+
+                drive.followTrajectory(move1);
+
+            }
+
+
         }
 
     }
@@ -200,9 +214,8 @@ public class WobbleBad extends LinearOpMode {
      * @param xSpeed
      * @param turnSpeed
      **/
-
     public void FieldRelative(double ySpeed, double xSpeed, double turnSpeed) {
-        double angle = roadrunnerAngleToFieldOrientedUsableAngle(robotPosition.getHeading()) + 90;//(robot.gyroNavigator.getAngleGood()) + (-90);
+        double angle = roadrunnerAngleToFieldOrientedUsableAngle(robotPosition.getHeading()) - 90;//(robot.gyroNavigator.getAngleGood()) + (-90);
         angle = AngleWrapDeg(angle);
         angle = -angle;
 
@@ -268,11 +281,17 @@ public class WobbleBad extends LinearOpMode {
 
         }
 
-        setDrivePowerLynxOptmized(frontLeftPower * speed,frontRightPower * speed,
-                backLeftPower * speed,backRightPower * speed);
+        setDrivePowerLynxOptmized(frontLeftPower * speed, frontRightPower * speed,
+                backLeftPower * speed, backRightPower * speed);
 
     }
 
+    /**
+     * field relative angle stuff
+     *
+     * @param degrees
+     * @return
+     */
     public double AngleWrapDeg(double degrees) {
         while (degrees < -180) {
             degrees += 2.0 * 180;
@@ -283,9 +302,9 @@ public class WobbleBad extends LinearOpMode {
         return degrees;
     }
 
-
     /**
-     * set power of the intake while optimizing lynx writes
+     * set intake power lynx optimized
+     *
      * @param power
      */
     public void setIntakePowerLynxOptimized(double power) {
@@ -295,6 +314,11 @@ public class WobbleBad extends LinearOpMode {
         lastIntakePower = power;
     }
 
+    /**
+     * set shooter power lynx optimized
+     *
+     * @param power
+     */
     public void setShooterPowerLynxOptimized(double power) {
         if (power != lastShooterPower) {
             myMotor1.setPower(power);
@@ -303,6 +327,11 @@ public class WobbleBad extends LinearOpMode {
         lastShooterPower = power;
     }
 
+    /**
+     * set indexer position lynx optimized
+     *
+     * @param position
+     */
     public void setIndexerPositionLynxOptmized(double position) {
         if (position != lastIndexerPosition) {
             robot.loader.indexer.setPosition(position);
@@ -311,6 +340,11 @@ public class WobbleBad extends LinearOpMode {
 
     }
 
+    /**
+     * set loader position lynx optimized
+     *
+     * @param position
+     */
     public void setLoaderPositionLynxOptmized(double position) {
         if (position != lastLoaderPosition) {
             robot.loader.loaderServo.setPosition(position);
@@ -318,6 +352,11 @@ public class WobbleBad extends LinearOpMode {
         lastLoaderPosition = position;
     }
 
+    /**
+     * set shooter position lynx optimized
+     *
+     * @param position
+     */
     public void setShootAnglePositionLynxOptimized(double position) {
         if (position != lastShootAnglePosition) {
             robot.shooter.ShootAngle.setPosition(position);
@@ -355,7 +394,6 @@ public class WobbleBad extends LinearOpMode {
         lastBlPower = bl;
         lastBrPower = br;
     }
-
 
     /**
      * convert angle from roadrunner to usable field relative angle
