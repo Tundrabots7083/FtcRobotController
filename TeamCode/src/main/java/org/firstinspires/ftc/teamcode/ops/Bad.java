@@ -6,6 +6,10 @@ import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -18,6 +22,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.TuningController;
 import org.firstinspires.ftc.teamcode.VelocityPIDFController;
 import org.firstinspires.ftc.teamcode.bots.TestBot;
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -29,6 +34,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
+
+import java.util.Arrays;
 
 @Autonomous(name = "Bad", group = "ops")
 public class Bad extends LinearOpMode {
@@ -56,19 +63,17 @@ public class Bad extends LinearOpMode {
     // Our velocity controller
     private final VelocityPIDFController veloController = new VelocityPIDFController(MOTOR_VELO_PID, kV, kA, kStatic);
 
-    //motors
-    public DcMotor intake = null;
-
     //servos
     public Servo wobbleArm;
     public Servo wobbleClaw;
     //variables
-    private long LOADER_TIME = 300;
+    private long LOADER_TIME = 250;
     private double INDEXER_UP = 1;
     private double INDEXER_DOWN = 0.65;
-    private double ANGLE_A = 0.84; // at shooting line
-    private double ANGLE_B = 0.815; //halfway
+    private double ANGLE_A = 0.83; // at shooting line
+    private double ANGLE_B = 0.81; //halfway
     private double ANGLE_C = 0.809; //behind the stack
+    private double ANGLE_POWERSHOT = 0.7;
 
     DcMotorEx myMotor1;
     DcMotorEx myMotor2;
@@ -79,7 +84,6 @@ public class Bad extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        // roadrunner pogg
 
         //PID motor setup
         myMotor1 = hardwareMap.get(DcMotorEx.class, "shooterOne");
@@ -96,13 +100,12 @@ public class Bad extends LinearOpMode {
 
         wobbleClaw = hardwareMap.get(Servo.class, "wobbleClaw");
         wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
-        intake = hardwareMap.get(DcMotor.class, "rightIntake");
-
 
         robot = new TestBot(this, logEnableTrace, logToTelemetry);
 
         robot.shooter.init();
         robot.loader.init();
+        robot.intake.init();
 
         wobbleClaw.setPosition(.15);
         wobbleArm.setPosition(0);
@@ -179,7 +182,7 @@ public class Bad extends LinearOpMode {
 
             //move to behind the stack to shoot
             Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
-                    .lineToLinearHeading(new Pose2d(-38, -38, 0))
+                    .lineToLinearHeading(new Pose2d(-38, -38, Math.toRadians(-8)))
                     .build();
 
             drive.followTrajectory(move1);
@@ -188,11 +191,19 @@ public class Bad extends LinearOpMode {
             ShootPID(3, ANGLE_C);
 
             //intake on
-            intake.setPower(-1);
+            robot.intake.setIntakePower(1);
 
             //drive over stack to be epic
             Trajectory move2 = drive.trajectoryBuilder(move1.end())
-                    .splineTo(new Vector2d(-27, -38), 0)
+                    .splineTo(
+                            new Vector2d(-27, -38), Math.toRadians(-8),
+                            new MinVelocityConstraint(
+                                    Arrays.asList(
+                                            new AngularVelocityConstraint(DriveConstants.MAX_ANG_VEL),
+                                            new MecanumVelocityConstraint(20, DriveConstants.TRACK_WIDTH))
+                            ),
+                            new ProfileAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                    )
                     .build();
 
             drive.followTrajectory(move2);
@@ -204,22 +215,30 @@ public class Bad extends LinearOpMode {
 
             //drive to line to shoot again
             Trajectory move4 = drive.trajectoryBuilder(move2.end())
-                    .splineTo(new Vector2d(-4, -38), 0)
+                    .splineTo(
+                            new Vector2d(-4, -38), Math.toRadians(-9),
+                            new MinVelocityConstraint(
+                                    Arrays.asList(
+                                            new AngularVelocityConstraint(DriveConstants.MAX_ANG_VEL),
+                                            new MecanumVelocityConstraint(10, DriveConstants.TRACK_WIDTH))
+                            ),
+                            new ProfileAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                    )
                     .build();
 
             drive.followTrajectory(move4);
 
-            sleep(3000);
+            sleep(2500);
 
             //shoot three rings
             ShootPID(3, ANGLE_A);
 
             //intake off
-            intake.setPower(0);
+            robot.intake.setIntakePower(0);
 
             //drop off wobble 1
             Trajectory move5 = drive.trajectoryBuilder(move4.end())
-                    .lineToLinearHeading(new Pose2d(49, -44, Math.toRadians(-25)))
+                    .lineToLinearHeading(new Pose2d(50, -47, Math.toRadians(-27)))
                     .build();
 
             drive.followTrajectory(move5);
@@ -227,19 +246,37 @@ public class Bad extends LinearOpMode {
             //drop wobble one
             ReleaseWobble();
 
+            /*
+            OLD CRINGE WAY NOW WE HAVE TWO POG PATHS
             //go pickup wobble 2
             Trajectory move6 = drive.trajectoryBuilder(move5.end())
-                    .lineToLinearHeading(new Pose2d(-32, -29, Math.toRadians(180)))
+                    .lineTo(new Vector2d(-33, -29))
                     .build();
 
             drive.followTrajectory(move6);
+*/
+
+            //pickup wobble 2 movement 1
+            Trajectory move420 = drive.trajectoryBuilder(move5.end())
+                    .lineToLinearHeading(new Pose2d(-15, -15, Math.toRadians(90)))
+                    .build();
+
+            drive.followTrajectory(move420);
+
+            //pickup wobble 2 movement 2
+            Trajectory move6 = drive.trajectoryBuilder(move420.end())
+                    .lineToLinearHeading(new Pose2d(-29, -34, Math.toRadians(180)))
+                    .build();
+
+            drive.followTrajectory(move6);
+
 
             //pick up second wobble
             PickupWobble();
 
             //drop off wobble 2
             Trajectory move7 = drive.trajectoryBuilder(move6.end())
-                    .lineToLinearHeading(new Pose2d(44, -41, Math.toRadians(-17)))
+                    .lineToLinearHeading(new Pose2d(44, -41, Math.toRadians(-19)))
                     .build();
 
             drive.followTrajectory(move7);
@@ -262,7 +299,7 @@ public class Bad extends LinearOpMode {
 
             //move to behind the stack to shoot
             Trajectory move1 = drive.trajectoryBuilder(new Pose2d(-63, -43, 0))
-                    .lineToLinearHeading(new Pose2d(-38, -40, 0))
+                    .lineToLinearHeading(new Pose2d(-38, -38, Math.toRadians(-8)))
                     .build();
 
             drive.followTrajectory(move1);
@@ -271,33 +308,43 @@ public class Bad extends LinearOpMode {
             ShootPID(3, ANGLE_C);
 
             //intake on
-            intake.setPower(-1);
+            robot.intake.setIntakePower(1);
 
             //drive into the 1 ring
             Trajectory move2 = drive.trajectoryBuilder(move1.end())
-                    .splineTo(new Vector2d(-30, -40), 0)
+                    .splineTo(new Vector2d(-30, -38), 0)
                     .build();
 
             drive.followTrajectory(move2);
 
+            /*
+            ayo i was cringe and broke this somehow idrk what happened JUST PRETEND THIS STUFF ISN'T HERE
             //move to the launch line
             Trajectory move69 = drive.trajectoryBuilder(move2.end())
-                    .splineTo(new Vector2d(-4, -40), 0)
+                    .lineToLinearHeading(new Pose2d(-4, -38, Math.toRadians(90))
                     .build();
 
-            drive.followTrajectory(move2);
+            drive.followTrajectory(move69);
+            */
+
+            //drive to the launch line
+            Trajectory move69 = drive.trajectoryBuilder(move2.end())
+                    .lineToLinearHeading(new Pose2d(-4, -38, Math.toRadians(5)))
+                    .build();
+
+            drive.followTrajectory(move69);
 
             sleep(1000);
 
-            //shoot 1 ring 3 attempts
-            ShootPID(3, ANGLE_B);
+            //shoot 1 ring 3 attempts INTO TTHE POWERSHOT BECAUSE WE ARE GAMERS POGCHAMP
+            ShootPID(3, ANGLE_POWERSHOT);
 
             //intake off
-            intake.setPower(0);
+            robot.intake.setIntakePower(0);
 
             //drive to zone b for wobble one
             Trajectory move3 = drive.trajectoryBuilder(move69.end())
-                    .splineTo(new Vector2d(17.5, -26), 0)
+                    .splineTo(new Vector2d(17.5, -24), 0)
                     .build();
 
             drive.followTrajectory(move3);
@@ -317,7 +364,7 @@ public class Bad extends LinearOpMode {
 
             //drive to zone a to drop second wobble
             Trajectory move5 = drive.trajectoryBuilder(move4.end())
-                    .splineToLinearHeading(new Pose2d(16, -29, Math.toRadians(0)), 0)
+                    .lineToLinearHeading(new Pose2d(14, -31, Math.toRadians(0)))
                     .build();
 
             drive.followTrajectory(move5);
@@ -346,11 +393,23 @@ public class Bad extends LinearOpMode {
 
             drive.followTrajectory(move1);
 
-            //shoot three rings
-            ShootPID(3, ANGLE_A);
+            //shoot TWO rings
+            ShootPID(2, ANGLE_A);
+
+            //drive to the launch line to shoot powershots yuh
+            Trajectory move69 = drive.trajectoryBuilder(move1.end())
+                    .lineToLinearHeading(new Pose2d(-4, -38, Math.toRadians(5)))
+                    .build();
+
+            drive.followTrajectory(move69);
+
+            sleep(1000);
+
+            //shoot 1 ring 3 attempts INTO TTHE POWERSHOT BECAUSE WE ARE GAMERS POGCHAMP
+            ShootPID(3, ANGLE_POWERSHOT);
 
             //turn towards zone a
-            Trajectory move2 = drive.trajectoryBuilder(move1.end())
+            Trajectory move2 = drive.trajectoryBuilder(move69.end())
                     .splineToLinearHeading(new Pose2d(-1, -52, Math.toRadians(-25)), 0)
                     .build();
 
@@ -361,7 +420,7 @@ public class Bad extends LinearOpMode {
 
             //drive to pick up second wobble
             Trajectory move3 = drive.trajectoryBuilder(move2.end())
-                    .splineToLinearHeading(new Pose2d(-31, -29, Math.toRadians(180)), 0)
+                    .splineToLinearHeading(new Pose2d(-28, -29, Math.toRadians(180)), 0)
                     .build();
 
             drive.followTrajectory(move3);

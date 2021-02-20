@@ -58,7 +58,11 @@ public class WobbleBad extends LinearOpMode {
     private double lastBlPower = 1000000;
     private double lastBrPower = 1000000;
 
-    private Pose2d robotPosition = new Pose2d(0,0,0);
+    //loading time for automated powershots
+    private long LOADING_TIME = 150;
+
+    private Pose2d robotPosition = new Pose2d(0, 0, 0);
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -87,7 +91,6 @@ public class WobbleBad extends LinearOpMode {
         wobbleArm = hardwareMap.get(Servo.class, "wobbleArm");
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-
         waitForStart();
 
         //hardware map init
@@ -102,7 +105,6 @@ public class WobbleBad extends LinearOpMode {
         //init servo positions
         wobbleArm.setPosition(.2);
         robot.shooter.ShootAngle.setPosition(.84);
-
 
         if (isStopRequested()) return;
 
@@ -194,15 +196,75 @@ public class WobbleBad extends LinearOpMode {
 
             //automated powershots
             if (gamepad1.dpad_left) {
+                drive.setPoseEstimate(new Pose2d(1, 15));
+                setShootAnglePositionLynxOptimized(.8);
+                //turn shooter on
+                setShooterPowerLynxOptimized(power);
+                myMotor1.setVelocity((2290 * 42) / 60);
+                myMotor2.setVelocity((2290 * 42) / 60);
+                //tilt indexer back
+                setIndexerPositionLynxOptmized(1);
+                //go to position
                 Trajectory move1 = drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .splineTo(new Vector2d(-38, -38), 0)
+                        .lineToLinearHeading(new Pose2d(-4, -34, 0))
                         .build();
-
                 drive.followTrajectory(move1);
-
+                //load indexer and bring arm back
+                sleep(LOADING_TIME);
+                setLoaderPositionLynxOptmized(.67);
+                sleep(LOADING_TIME);
+                setLoaderPositionLynxOptmized(.83);
+                sleep(LOADING_TIME);
+                //turn middle powershot
+                drive.turn(Math.toRadians(8));
+                sleep(LOADING_TIME);
+                //load indexer and bring arm back
+                setLoaderPositionLynxOptmized(.67);
+                sleep(LOADING_TIME);
+                setLoaderPositionLynxOptmized(.83);
+                sleep(LOADING_TIME);
+                //turn left powershot
+                drive.turn(Math.toRadians(9));
+                //load indexer and bring arm back
+                sleep(LOADING_TIME);
+                setLoaderPositionLynxOptmized(.67);
+                sleep(LOADING_TIME);
+                setLoaderPositionLynxOptmized(.83);
+                //shooter OFF POGCHAMP
+                myMotor2.setVelocity(0);
+                myMotor1.setVelocity(0);
             }
 
-
+            //automated high goal shooting
+            if (gamepad1.dpad_right) {
+                //turn shooter on
+                setShooterPowerLynxOptimized(power);
+                //tilt indexer back
+                setIndexerPositionLynxOptmized(1);
+                //go to position
+                Trajectory move1 = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .lineToLinearHeading(new Pose2d(-4, -38, 0))
+                        .build();
+                drive.followTrajectory(move1);
+                //load indexer and bring arm back
+                sleep(1000);
+                setLoaderPositionLynxOptmized(.67);
+                sleep(1000);
+                setLoaderPositionLynxOptmized(.83);
+                sleep(1000);
+                //load indexer and bring arm back
+                setLoaderPositionLynxOptmized(.67);
+                sleep(1000);
+                setLoaderPositionLynxOptmized(.83);
+                sleep(1000);
+                //load indexer and bring arm back
+                sleep(1000);
+                setLoaderPositionLynxOptmized(.67);
+                sleep(1000);
+                setLoaderPositionLynxOptmized(.83);
+                //shooter OFF POGCHAMP
+                setShooterPowerLynxOptimized(0);
+            }
         }
 
     }
@@ -215,9 +277,10 @@ public class WobbleBad extends LinearOpMode {
      * @param turnSpeed
      **/
     public void FieldRelative(double ySpeed, double xSpeed, double turnSpeed) {
-        double angle = roadrunnerAngleToFieldOrientedUsableAngle(robotPosition.getHeading()) - 90;//(robot.gyroNavigator.getAngleGood()) + (-90);
+        double angle = roadrunnerAngleToFieldOrientedUsableAngle(robotPosition.getHeading()) + (90);
+        //double angle = (robot.gyroNavigator.getAngleGood()) + (-90);
         angle = AngleWrapDeg(angle);
-        angle = -angle;
+        //angle = -angle;
 
         xSpeed = Range.clip(xSpeed, -1, 1);
         ySpeed = Range.clip(ySpeed, -1, 1);
