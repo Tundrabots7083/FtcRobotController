@@ -176,7 +176,7 @@ public class triangles extends LinearOpMode {
                 //Vector2d shotParabolaFocus = new Vector2d(shotVertexX, shotVertexY + (14 * aValue));
                 //double tanTest = 300.0/400.0;
                 double degrees = (double)Math.atan(shotVertexY/shotVertexX);
-                double shootDegrees = degrees + 0.5; // Converts the degrees into decimal so it can be used in the Shooter Servos
+                double shootDegrees = 3 * degrees; // Converts the degrees into decimal so it can be used in the Shooter Servos
                 telemetry.addData("hypo: ", hypo);
                 telemetry.addData("shotAngleDegrees: ", degrees);
                 telemetry.addData("shotAngleDecimal: ", shootDegrees);
