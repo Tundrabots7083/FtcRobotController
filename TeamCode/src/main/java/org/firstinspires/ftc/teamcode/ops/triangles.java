@@ -159,7 +159,8 @@ public class triangles extends LinearOpMode {
                 hypo = Math.sqrt(Math.pow(adj, 2) + Math.pow(opp, 2)); // We get the hypotenuse of the aim triangle so that we can use it as the adjacent for the shooting triangle
                 double aimAngle = Math.atan(opp / adj);
                 //double aimDegrees = (currentRotation + (-90 - currentRotation)) + robotAngle;
-                drive.turn(Math.toRadians(aimAngle));
+                //drive.turn(Math.toRadians(aimAngle));
+                drive.aimTurn(Math.toRadians(aimAngle));
             }
             if (gamepad1.left_bumper)
             {
